@@ -78,8 +78,12 @@ test.describe("Dashboard - Search", () => {
 
     await homePage.searchProduct("ZARA");
     await homePage.searchInput.clear();
-    await homePage.searchInput.press("Enter");
-    await page.waitForLoadState("networkidle");
+    await Promise.all([
+      page.waitForResponse((res) =>
+        res.url().includes("/api/ecom/product/get-all-products"),
+      ),
+      homePage.searchInput.press("Enter"),
+    ]);
 
     await expect(homePage.products).toHaveCount(totalBefore);
   });
