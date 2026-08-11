@@ -9,6 +9,7 @@ import { RegisterationPage } from "../pageObjects/RegisterationPage.js";
 import { CartPage } from "../pageObjects/CartPage.js";
 import { OrdersPage } from "../pageObjects/OrdersPage.js";
 import { generateRegistrationData } from "../utils/testData.js";
+import { registerWithRetry } from "../utils/registerWithRetry.js";
 
 dotenv.config();
 
@@ -21,38 +22,10 @@ const AUTH_DIR = path.join(__dirname, "../.auth");
 // session silently causing confusing auth failures deep into a test run.
 const STALE_AFTER_MS = 24 * 60 * 60 * 1000; // 24 hours
 
-async function registerWithRetry(
-  loginPage,
-  registerationPage,
-  workerIndex,
-  attempts = 3,
-) {
-  for (let attempt = 1; attempt <= attempts; attempt++) {
-    const user = generateRegistrationData();
-    user.email = user.email.replace(
-      "@test.com",
-      `.w${workerIndex}.a${attempt}@test.com`,
-    );
-
-    try {
-      await registerationPage.register(
-        user.firstName,
-        user.lastName,
-        user.email,
-        user.phone,
-        user.occupation,
-        user.gender,
-        user.password,
-      );
-      return user;
-    } catch (error) {
-      if (attempt === attempts) throw error;
-      console.log(
-        `Registration attempt ${attempt} failed, retrying with a new account...`,
-      );
-    }
-  }
-}
+// registerWithRetry now lives in utils/registerWithRetry.js — shared with
+// tests/auth/registration.spec.js so both get the same resilience against
+// this site's known-flaky registration endpoint, instead of duplicating
+// (and risking drifting) the retry logic in two places.
 
 /**
  * Registers and logs in one isolated account per Playwright worker, all
@@ -97,11 +70,9 @@ export default async function globalSetup(config) {
       waitUntil: "domcontentloaded",
     });
     await loginPage.navigateToRegisteration();
-    const user = await registerWithRetry(
-      loginPage,
-      registerationPage,
-      workerIndex,
-    );
+    const user = await registerWithRetry(loginPage, registerationPage, {
+      tag: `w${workerIndex}`,
+    });
     await loginPage.login(user.email, user.password);
 
     await page.waitForURL("**/dashboard/dash**");
