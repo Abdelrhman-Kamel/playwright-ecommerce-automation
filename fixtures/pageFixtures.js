@@ -1,7 +1,8 @@
 import { test as base, expect } from "@playwright/test";
+import { allure } from "allure-playwright";
 import path from "path";
 import { fileURLToPath } from "url";
-import { POManager } from "../pageObjects/POManager.js";
+import { POManager } from "../pageObjects/POManager";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -13,13 +14,29 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  */
 export const test = base.extend({
   // -------------------------------------------------------------------------
+  // Auto-fixture (auto: true) — runs for EVERY test automatically, no
+  // destructuring needed. Maps our existing @smoke/@regression/@security
+  // tags into Allure's epic/feature hierarchy, so the Allure report can
+  // group and filter by them visually without annotating every spec file
+  // individually.
+  // -------------------------------------------------------------------------
+  allureLabels: [
+    async ({}, use, testInfo) => {
+      for (const tag of testInfo.tags) {
+        if (tag === "@smoke") allure.epic("Smoke Suite");
+        if (tag === "@regression") allure.epic("Regression Suite");
+        if (tag === "@security") allure.feature("Security");
+      }
+      await use();
+    },
+    { auto: true },
+  ],
+
+  // -------------------------------------------------------------------------
   // Picks the storage state file that globalSetup.js created for THIS
   // worker (.auth/worker-{parallelIndex}.json). This is cheap and test-scoped
   // — all the actual expensive work (registering + logging in) already
   // happened once upfront in globalSetup, not here.
-  //
-  // testInfo.parallelIndex is a stable 0-based index Playwright assigns per
-  // worker, matching the workerIndex used when globalSetup created the files.
   // -------------------------------------------------------------------------
   storageState: async ({}, use, testInfo) => {
     await use(
@@ -41,7 +58,7 @@ export const test = base.extend({
   },
 
   homePage: async ({ poManager }, use) => {
-    await use(poManager.getDashboardPage());
+    await use(poManager.getHomePage());
   },
 
   cartPage: async ({ poManager }, use) => {

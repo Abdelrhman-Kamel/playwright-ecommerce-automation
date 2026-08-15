@@ -33,7 +33,14 @@ export default defineConfig({
      "html" for the full report afterward. open: 'never' stops it from
      auto-launching a browser tab after every single run — use
      `npm run test:report` to open it on demand instead. */
-  reporter: [["list"], ["html", { open: "never" }]],
+  reporter: [
+    ["list"],
+    ["html", { open: "never" }],
+    [
+      "allure-playwright",
+      { detail: true, outputFolder: "allure-results", suiteTitle: false },
+    ],
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
