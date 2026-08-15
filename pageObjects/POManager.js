@@ -1,6 +1,6 @@
 import { RegisterationPage } from "./RegisterationPage.js";
 import { LoginPage } from "./LoginPage.js";
-import { DashboardPage } from "./DashboardPage.js";
+import { HomePage } from "./HomePage.js";
 import { CartPage } from "./CartPage.js";
 import { CheckoutPage } from "./CheckoutPage.js";
 import { OrdersPage } from "./OrdersPage.js";
@@ -31,12 +31,12 @@ export class POManager {
     return this.pageObjects.loginPage;
   }
 
-  getDashboardPage() {
+  getHomePage() {
     // Lazily initialize and reuse the same page object instance.
-    if (!this.pageObjects.dashboardPage) {
-      this.pageObjects.dashboardPage = new DashboardPage(this.page);
+    if (!this.pageObjects.homePage) {
+      this.pageObjects.homePage = new HomePage(this.page);
     }
-    return this.pageObjects.dashboardPage;
+    return this.pageObjects.homePage;
   }
 
   getCartPage() {
