@@ -64,6 +64,10 @@ test.describe("Login", { tag: ["@regression"] }, () => {
     loginPage,
     homePage,
   }) => {
+    test.fail(
+      true,
+      "Bug found via automation: login is case-sensitive on email, should not be.",
+    );
     await loginPage.login(
       credentials.username.toUpperCase(),
       credentials.password,

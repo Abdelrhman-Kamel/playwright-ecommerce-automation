@@ -89,6 +89,10 @@ test.describe("Dashboard - Search", { tag: ["@regression"] }, () => {
   });
 
   test("search is case-insensitive", async ({ homePage }) => {
+    test.fail(
+      true,
+      "Bug found via automation: search returns no results when query case doesn't match product name casing.",
+    );
     await homePage.searchProduct("zara");
 
     await expect(homePage.products.first()).toContainText("zara", {
