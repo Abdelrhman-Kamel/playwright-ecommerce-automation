@@ -4,7 +4,7 @@ import { ROUTES } from "../../constants/routes";
 // ---------------------------------------------------------------------------
 // Cart management — adding, removing, and navigating from the cart
 // ---------------------------------------------------------------------------
-test.describe("Cart management", () => {
+test.describe("Cart management", { tag: ["@regression"] }, () => {
   test.beforeEach(async ({ page, homePage }) => {
     await page.goto(ROUTES.home, { waitUntil: "domcontentloaded" });
     await homePage.products.first().waitFor();

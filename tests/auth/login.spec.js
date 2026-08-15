@@ -7,7 +7,7 @@ test.use({ storageState: { cookies: [], origins: [] } });
 // ---------------------------------------------------------------------------
 // Functional tests
 // ---------------------------------------------------------------------------
-test.describe("Login", () => {
+test.describe("Login", { tag: ["@regression"] }, () => {
   let credentials;
 
   test.beforeEach(async ({ page }) => {
@@ -98,7 +98,7 @@ test.describe("Login", () => {
 // ---------------------------------------------------------------------------
 // UI / validation tests
 // ---------------------------------------------------------------------------
-test.describe("Login page UI", () => {
+test.describe("Login page UI", { tag: ["@regression"] }, () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(ROUTES.login, { waitUntil: "domcontentloaded" });
     await page.getByRole("button", { name: "Login" }).waitFor();

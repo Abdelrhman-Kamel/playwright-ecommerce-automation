@@ -21,39 +21,41 @@ test.beforeAll(async () => {
   token = await api.getToken();
 });
 
-test("renders the empty orders state via a mocked API response (network interception)", async ({
-  page,
-}) => {
-  await page.addInitScript((value) => {
-    window.localStorage.setItem("token", value);
-  }, token);
-  await page.goto("https://rahulshettyacademy.com/client/");
+test(
+  "renders the empty orders state via a mocked API response (network interception)",
+  { tag: ["@regression"] },
+  async ({ page }) => {
+    await page.addInitScript((value) => {
+      window.localStorage.setItem("token", value);
+    }, token);
+    await page.goto("https://rahulshettyacademy.com/client/");
 
-  // Intercept the real orders API response and replace it with a fake
-  // "no orders" payload, regardless of what the account actually has —
-  // verifies the frontend renders the empty state correctly rather than
-  // trusting/crashing on unexpected data shapes.
-  await page.route(
-    "https://rahulshettyacademy.com/api/ecom/order/get-orders-for-customer/*",
-    async (route) => {
-      const response = await page.request.fetch(route.request(), {
-        ignoreHTTPSErrors: true,
-      });
-      await route.fulfill({
-        response,
-        body: JSON.stringify(fakeEmptyOrdersResponse),
-      });
-    },
-  );
+    // Intercept the real orders API response and replace it with a fake
+    // "no orders" payload, regardless of what the account actually has —
+    // verifies the frontend renders the empty state correctly rather than
+    // trusting/crashing on unexpected data shapes.
+    await page.route(
+      "https://rahulshettyacademy.com/api/ecom/order/get-orders-for-customer/*",
+      async (route) => {
+        const response = await page.request.fetch(route.request(), {
+          ignoreHTTPSErrors: true,
+        });
+        await route.fulfill({
+          response,
+          body: JSON.stringify(fakeEmptyOrdersResponse),
+        });
+      },
+    );
 
-  await page
-    .getByRole("listitem")
-    .getByRole("button", { name: "ORDERS" })
-    .click();
-  await page.waitForResponse(
-    "https://rahulshettyacademy.com/api/ecom/order/get-orders-for-customer/*",
-  );
-  await page.locator(".mt-4").waitFor();
+    await page
+      .getByRole("listitem")
+      .getByRole("button", { name: "ORDERS" })
+      .click();
+    await page.waitForResponse(
+      "https://rahulshettyacademy.com/api/ecom/order/get-orders-for-customer/*",
+    );
+    await page.locator(".mt-4").waitFor();
 
-  await expect(page.locator(".mt-4")).toContainText("No Orders");
-});
+    await expect(page.locator(".mt-4")).toContainText("No Orders");
+  },
+);

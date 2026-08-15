@@ -22,7 +22,7 @@ const CHECKOUT = {
 // `page` fixture, so destructuring them in beforeAll is invalid and
 // throws at runtime, not just a style inconsistency.)
 // ---------------------------------------------------------------------------
-test.describe("Orders management", () => {
+test.describe("Orders management", { tag: ["@regression"] }, () => {
   let orderId;
   let productName;
 
@@ -129,7 +129,7 @@ test.describe("Orders management", () => {
 // ---------------------------------------------------------------------------
 // Order deletion — self-contained: places then deletes its own order
 // ---------------------------------------------------------------------------
-test.describe("Orders - delete", () => {
+test.describe("Orders - delete", { tag: ["@regression"] }, () => {
   // Remove any orders left behind if the test fails before completing deletion.
   test.afterEach(async ({ page, ordersPage }) => {
     await page.goto(ROUTES.orders, { waitUntil: "domcontentloaded" });

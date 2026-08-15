@@ -13,7 +13,7 @@ const CHECKOUT = {
 // ---------------------------------------------------------------------------
 // Shared setup — add a product to cart and proceed to checkout
 // ---------------------------------------------------------------------------
-test.describe("Checkout flow", () => {
+test.describe("Checkout flow", { tag: ["@regression"] }, () => {
   let productName;
 
   test.beforeEach(async ({ page, homePage, sideBar, cartPage }) => {

@@ -39,33 +39,35 @@ test.beforeAll(async () => {
   foreignOrderId = await secondaryApi.createOrder(createOrderPayload);
 });
 
-test("user cannot view another account's order details via a tampered request", async ({
-  page,
-}) => {
-  await page.addInitScript((value) => {
-    window.localStorage.setItem("token", value);
-  }, token);
-  await page.goto("https://rahulshettyacademy.com/client/");
+test(
+  "user cannot view another account's order details via a tampered request",
+  { tag: ["@security", "@regression"] },
+  async ({ page }) => {
+    await page.addInitScript((value) => {
+      window.localStorage.setItem("token", value);
+    }, token);
+    await page.goto("https://rahulshettyacademy.com/client/");
 
-  await page
-    .getByRole("listitem")
-    .getByRole("button", { name: "ORDERS" })
-    .click();
+    await page
+      .getByRole("listitem")
+      .getByRole("button", { name: "ORDERS" })
+      .click();
 
-  // Intercept the "get order details" request and redirect it to the
-  // secondary account's order ID — simulates a user tampering with the
-  // request to try to view an order that isn't theirs.
-  await page.route(
-    "https://rahulshettyacademy.com/api/ecom/order/get-orders-details?id=*",
-    (route) =>
-      route.continue({
-        url: `https://rahulshettyacademy.com/api/ecom/order/get-orders-details?id=${foreignOrderId}`,
-      }),
-  );
+    // Intercept the "get order details" request and redirect it to the
+    // secondary account's order ID — simulates a user tampering with the
+    // request to try to view an order that isn't theirs.
+    await page.route(
+      "https://rahulshettyacademy.com/api/ecom/order/get-orders-details?id=*",
+      (route) =>
+        route.continue({
+          url: `https://rahulshettyacademy.com/api/ecom/order/get-orders-details?id=${foreignOrderId}`,
+        }),
+    );
 
-  await page.locator("button").filter({ hasText: "View" }).first().click();
+    await page.locator("button").filter({ hasText: "View" }).first().click();
 
-  await expect(page.locator("p.blink_me")).toHaveText(
-    "You are not authorize to view this order",
-  );
-});
+    await expect(page.locator("p.blink_me")).toHaveText(
+      "You are not authorize to view this order",
+    );
+  },
+);

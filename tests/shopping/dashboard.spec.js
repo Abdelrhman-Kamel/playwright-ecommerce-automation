@@ -4,7 +4,7 @@ import { ROUTES } from "../../constants/routes";
 // ---------------------------------------------------------------------------
 // Shared setup — navigate to dashboard (already authenticated)
 // ---------------------------------------------------------------------------
-test.describe("Dashboard - Product listing", () => {
+test.describe("Dashboard - Product listing", { tag: ["@regression"] }, () => {
   test.beforeEach(async ({ page, homePage }) => {
     await page.goto(ROUTES.home, { waitUntil: "domcontentloaded" });
     await homePage.products.first().waitFor();
@@ -41,7 +41,7 @@ test.describe("Dashboard - Product listing", () => {
 // ---------------------------------------------------------------------------
 // Search
 // ---------------------------------------------------------------------------
-test.describe("Dashboard - Search", () => {
+test.describe("Dashboard - Search", { tag: ["@regression"] }, () => {
   test.beforeEach(async ({ page, homePage }) => {
     await page.goto(ROUTES.home, { waitUntil: "domcontentloaded" });
     await homePage.products.first().waitFor();
@@ -100,7 +100,7 @@ test.describe("Dashboard - Search", () => {
 // ---------------------------------------------------------------------------
 // Cart interactions
 // ---------------------------------------------------------------------------
-test.describe("Dashboard - Cart interactions", () => {
+test.describe("Dashboard - Cart interactions", { tag: ["@regression"] }, () => {
   test.beforeEach(async ({ page, homePage }) => {
     await page.goto(ROUTES.home, { waitUntil: "domcontentloaded" });
     await homePage.products.first().waitFor();
@@ -158,74 +158,82 @@ test.describe("Dashboard - Cart interactions", () => {
 // ---------------------------------------------------------------------------
 // Price range filter
 // ---------------------------------------------------------------------------
-test.describe("Dashboard - Price range filter", () => {
-  test.beforeEach(async ({ page, homePage }) => {
-    await page.goto(ROUTES.home, { waitUntil: "domcontentloaded" });
-    await homePage.products.first().waitFor();
-  });
+test.describe(
+  "Dashboard - Price range filter",
+  { tag: ["@regression"] },
+  () => {
+    test.beforeEach(async ({ page, homePage }) => {
+      await page.goto(ROUTES.home, { waitUntil: "domcontentloaded" });
+      await homePage.products.first().waitFor();
+    });
 
-  test("price filter inputs are visible", async ({ homePage }) => {
-    await expect(homePage.minPriceInput).toBeVisible();
-    await expect(homePage.maxPriceInput).toBeVisible();
-  });
+    test("price filter inputs are visible", async ({ homePage }) => {
+      await expect(homePage.minPriceInput).toBeVisible();
+      await expect(homePage.maxPriceInput).toBeVisible();
+    });
 
-  test("applying a price range filters the product list", async ({
-    homePage,
-  }) => {
-    const totalBefore = await homePage.products.count();
+    test("applying a price range filters the product list", async ({
+      homePage,
+    }) => {
+      const totalBefore = await homePage.products.count();
 
-    await homePage.minPriceInput.fill("10");
-    await homePage.maxPriceInput.fill("50");
-    await homePage.maxPriceInput.press("Enter");
+      await homePage.minPriceInput.fill("10");
+      await homePage.maxPriceInput.fill("50");
+      await homePage.maxPriceInput.press("Enter");
 
-    await expect(homePage.products.first()).toBeVisible();
-    const totalAfter = await homePage.products.count();
-    expect(totalAfter).toBeLessThanOrEqual(totalBefore);
-  });
-});
+      await expect(homePage.products.first()).toBeVisible();
+      const totalAfter = await homePage.products.count();
+      expect(totalAfter).toBeLessThanOrEqual(totalBefore);
+    });
+  },
+);
 
 // ---------------------------------------------------------------------------
 // Sidebar navigation
 // ---------------------------------------------------------------------------
-test.describe("Dashboard - Sidebar navigation", () => {
-  test.beforeEach(async ({ page, homePage }) => {
-    await page.goto(ROUTES.home, { waitUntil: "domcontentloaded" });
-    await homePage.products.first().waitFor();
-  });
+test.describe(
+  "Dashboard - Sidebar navigation",
+  { tag: ["@regression"] },
+  () => {
+    test.beforeEach(async ({ page, homePage }) => {
+      await page.goto(ROUTES.home, { waitUntil: "domcontentloaded" });
+      await homePage.products.first().waitFor();
+    });
 
-  test("navigating to Orders via sidebar lands on the orders page", async ({
-    page,
-    sideBar,
-  }) => {
-    await sideBar.navigateToOrderPage();
+    test("navigating to Orders via sidebar lands on the orders page", async ({
+      page,
+      sideBar,
+    }) => {
+      await sideBar.navigateToOrderPage();
 
-    await expect(page).toHaveURL(/.*\/#\/dashboard\/myorders/);
-  });
+      await expect(page).toHaveURL(/.*\/#\/dashboard\/myorders/);
+    });
 
-  test("navigating to Cart via sidebar lands on the cart page", async ({
-    page,
-    sideBar,
-  }) => {
-    await sideBar.navigateToCartPage();
+    test("navigating to Cart via sidebar lands on the cart page", async ({
+      page,
+      sideBar,
+    }) => {
+      await sideBar.navigateToCartPage();
 
-    await expect(page).toHaveURL(/.*\/#\/dashboard\/cart/);
-  });
+      await expect(page).toHaveURL(/.*\/#\/dashboard\/cart/);
+    });
 
-  test("navigating Home from Orders returns to the dashboard", async ({
-    homePage,
-    sideBar,
-  }) => {
-    await sideBar.navigateToOrderPage();
-    await sideBar.navigateToHomePage();
+    test("navigating Home from Orders returns to the dashboard", async ({
+      homePage,
+      sideBar,
+    }) => {
+      await sideBar.navigateToOrderPage();
+      await sideBar.navigateToHomePage();
 
-    await expect(homePage.products.first()).toBeVisible();
-  });
-});
+      await expect(homePage.products.first()).toBeVisible();
+    });
+  },
+);
 
 // ---------------------------------------------------------------------------
 // Product details
 // ---------------------------------------------------------------------------
-test.describe("Dashboard - Product details", () => {
+test.describe("Dashboard - Product details", { tag: ["@regression"] }, () => {
   test.beforeEach(async ({ page, homePage }) => {
     await page.goto(ROUTES.home, { waitUntil: "domcontentloaded" });
     await homePage.products.first().waitFor();

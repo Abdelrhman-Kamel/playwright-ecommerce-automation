@@ -8,7 +8,7 @@ test.use({ storageState: { cookies: [], origins: [] } });
 // ---------------------------------------------------------------------------
 // Functional tests
 // ---------------------------------------------------------------------------
-test.describe("Registration", () => {
+test.describe("Registration", { tag: ["@regression"] }, () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(ROUTES.register, { waitUntil: "domcontentloaded" });
     await page.getByRole("button", { name: "Register" }).waitFor();
@@ -90,7 +90,7 @@ test.describe("Registration", () => {
 // ---------------------------------------------------------------------------
 // UI / validation tests
 // ---------------------------------------------------------------------------
-test.describe("Registration page UI", () => {
+test.describe("Registration page UI", { tag: ["@regression"] }, () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(ROUTES.register, { waitUntil: "domcontentloaded" });
     await page.getByRole("button", { name: "Register" }).waitFor();
