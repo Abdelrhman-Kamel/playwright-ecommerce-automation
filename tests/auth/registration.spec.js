@@ -1,5 +1,6 @@
 import { test, expect } from "../../fixtures/pageFixtures";
 import { generateRegistrationData } from "../../utils/testData";
+import { registerWithRetry } from "../../utils/registerWithRetry";
 import { ROUTES } from "../../constants/routes";
 
 test.use({ storageState: { cookies: [], origins: [] } });
@@ -17,17 +18,7 @@ test.describe("Registration", () => {
     loginPage,
     registerationPage,
   }) => {
-    const user = generateRegistrationData();
-
-    await registerationPage.register(
-      user.firstName,
-      user.lastName,
-      user.email,
-      user.phone,
-      user.occupation,
-      user.gender,
-      user.password,
-    );
+    await registerWithRetry(loginPage, registerationPage);
 
     await expect(loginPage.loginButton).toBeVisible();
   });
@@ -37,17 +28,7 @@ test.describe("Registration", () => {
     loginPage,
     registerationPage,
   }) => {
-    const user = generateRegistrationData();
-
-    await registerationPage.register(
-      user.firstName,
-      user.lastName,
-      user.email,
-      user.phone,
-      user.occupation,
-      user.gender,
-      user.password,
-    );
+    await registerWithRetry(loginPage, registerationPage);
 
     await expect(page).toHaveURL(/.*\/#\/auth\/login/);
     await expect(loginPage.loginButton).toBeVisible();
@@ -57,17 +38,9 @@ test.describe("Registration", () => {
     loginPage,
     registerationPage,
   }) => {
-    const user = generateRegistrationData();
-
-    await registerationPage.register(
-      user.firstName,
-      user.lastName,
-      user.email,
-      user.phone,
-      user.occupation,
-      "Male",
-      user.password,
-    );
+    await registerWithRetry(loginPage, registerationPage, {
+      overrides: { gender: "Male" },
+    });
 
     await expect(loginPage.loginButton).toBeVisible();
   });
@@ -76,39 +49,25 @@ test.describe("Registration", () => {
     loginPage,
     registerationPage,
   }) => {
-    const user = generateRegistrationData();
-
-    await registerationPage.register(
-      user.firstName,
-      user.lastName,
-      user.email,
-      user.phone,
-      user.occupation,
-      "Female",
-      user.password,
-    );
+    await registerWithRetry(loginPage, registerationPage, {
+      overrides: { gender: "Female" },
+    });
 
     await expect(loginPage.loginButton).toBeVisible();
   });
 
   test("registering with a duplicate email shows an error", async ({
     page,
+    loginPage,
     registerationPage,
   }) => {
-    const user = generateRegistrationData();
+    // First registration — genuinely needs to succeed, so it gets the same
+    // retry resilience as every other registration test (known-flaky endpoint).
+    const user = await registerWithRetry(loginPage, registerationPage);
 
-    // First registration — expected to succeed.
-    await registerationPage.register(
-      user.firstName,
-      user.lastName,
-      user.email,
-      user.phone,
-      user.occupation,
-      user.gender,
-      user.password,
-    );
-
-    // Navigate back and re-submit with the same email.
+    // Navigate back and re-submit with the SAME email — this one must NOT
+    // be retried, since retrying would generate a fresh email and defeat
+    // the point of testing the duplicate-email error path.
     await page.goto(ROUTES.register);
     await registerationPage.registerButton.waitFor();
 
