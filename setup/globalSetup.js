@@ -55,6 +55,22 @@ export default async function globalSetup(config) {
         console.log(
           `Worker ${workerIndex}: reusing existing account (${Math.round(ageMs / 60000)}m old)`,
         );
+
+        // Cached accounts can now persist across multiple runs, not just
+        // within one — so a previous run's failed/incomplete afterEach
+        // cleanup can silently carry forward. Clear cart/orders here too,
+        // using the cached session, WITHOUT redoing full registration/login.
+        const cachePage = await browser.newPage({ storageState: authFile });
+        await cachePage.goto(BASE_URL + ROUTES.cart, {
+          waitUntil: "domcontentloaded",
+        });
+        await new CartPage(cachePage).clearCart();
+        await cachePage.goto(BASE_URL + ROUTES.orders, {
+          waitUntil: "domcontentloaded",
+        });
+        await new OrdersPage(cachePage).clearOrders();
+        await cachePage.close();
+
         continue;
       }
       console.log(
