@@ -1,4 +1,4 @@
-export class DashboardPage {
+export class HomePage {
   constructor(page) {
     this.page = page;
     this.products = page.locator(".card-body");
