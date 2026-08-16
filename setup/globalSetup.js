@@ -16,6 +16,7 @@ dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BASE_URL = process.env.BASE_URL;
 const AUTH_DIR = path.join(__dirname, "../.auth");
+const ALLURE_RESULTS_DIR = path.join(__dirname, "../allure-results");
 
 // Cached worker accounts older than this are re-registered from scratch,
 // rather than trusted indefinitely — guards against a stale/expired
@@ -43,6 +44,23 @@ const STALE_AFTER_MS = 24 * 60 * 60 * 1000; // 24 hours
 export default async function globalSetup(config) {
   const workerCount = config.workers;
   fs.mkdirSync(AUTH_DIR, { recursive: true });
+
+  // Auto-write Allure's environment.properties on every run, so the
+  // generated report always shows current run context instead of the
+  // "There are no environment variables" empty state. allure-results/ gets
+  // wiped and rebuilt each run (via `allure generate --clean`), so this
+  // has to be written fresh here rather than committed as a static file.
+  fs.mkdirSync(ALLURE_RESULTS_DIR, { recursive: true });
+  fs.writeFileSync(
+    path.join(ALLURE_RESULTS_DIR, "environment.properties"),
+    [
+      `Base_URL=${BASE_URL}`,
+      `Framework=Playwright`,
+      `Browsers=Chromium, Firefox, Webkit`,
+      `Environment=${process.env.CI ? "CI" : "Local"}`,
+      `Run_Date=${new Date().toISOString()}`,
+    ].join("\n"),
+  );
 
   const browser = await chromium.launch();
 
