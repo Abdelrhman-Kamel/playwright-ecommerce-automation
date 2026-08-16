@@ -1,35 +1,109 @@
 name: Playwright Tests
+
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
+
+# Needed for the GitHub Pages deployment step below.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Serialize Pages deploys so overlapping runs don't race each other.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      env:
-        BASE_URL: ${{ secrets.BASE_URL }}
-        LOGIN_USERNAME: ${{ secrets.LOGIN_USERNAME }}
-        LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
-        SECURITY_TEST_EMAIL: ${{ secrets.SECURITY_TEST_EMAIL }}
-        SECURITY_TEST_PASSWORD: ${{ secrets.SECURITY_TEST_PASSWORD }}
-        SECONDARY_ACCOUNT_EMAIL: ${{ secrets.SECONDARY_ACCOUNT_EMAIL }}
-        SECONDARY_ACCOUNT_PASSWORD: ${{ secrets.SECONDARY_ACCOUNT_PASSWORD }}
-      run: npx playwright test
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      # allure-commandline needs a JRE to generate the report.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Only chromium is installed here — CI runs the fast chromium-only
+      # @regression pass on every push/PR. Full cross-browser coverage
+      - name: Install Playwright Browsers (chromium only)
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+          LOGIN_USERNAME: ${{ secrets.LOGIN_USERNAME }}
+          LOGIN_PASSWORD: ${{ secrets.LOGIN_PASSWORD }}
+          SECURITY_TEST_EMAIL: ${{ secrets.SECURITY_TEST_EMAIL }}
+          SECURITY_TEST_PASSWORD: ${{ secrets.SECURITY_TEST_PASSWORD }}
+          SECONDARY_ACCOUNT_EMAIL: ${{ secrets.SECONDARY_ACCOUNT_EMAIL }}
+          SECONDARY_ACCOUNT_PASSWORD: ${{ secrets.SECONDARY_ACCOUNT_PASSWORD }}
+        run: npx playwright test --project=chromium --grep @regression
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      # Tells Allure who/what actually ran this — populates the
+      # "Executors" panel on the report, which was empty when run locally.
+      - name: Write Allure executor info
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p allure-results
+          cat > allure-results/executor.json << EOF_INNER
+          {
+            "name": "GitHub Actions",
+            "type": "github",
+            "buildOrder": ${{ github.run_number }},
+            "buildName": "Run #${{ github.run_number }}",
+            "buildUrl": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+            "reportUrl": "../${{ github.run_number }}/"
+          }
+          EOF_INNER
+
+      - name: Generate Allure report
+        if: ${{ !cancelled() }}
+        run: npm run allure:generate
+
+      - name: Upload Allure report artifact
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: allure-report/
+          retention-days: 30
+
+      - name: Deploy Allure report to GitHub Pages
+        if: ${{ !cancelled() }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report/
+
+  deploy-pages:
+    if: ${{ !cancelled() }}
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
