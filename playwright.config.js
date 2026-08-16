@@ -46,6 +46,13 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('')`. */
     baseURL: process.env.BASE_URL,
 
+    /* Explicit, larger viewport — Playwright's default (1280x720) causes
+       this site's sticky recruiter/ad banner to overlap interactive
+       elements (e.g. the "Login here" link) that never overlap at a
+       typical local browser window size. Standardizing on a bigger
+       viewport avoids CI-only failures caused purely by screen size. */
+    viewport: { width: 1920, height: 1080 },
+
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
 
