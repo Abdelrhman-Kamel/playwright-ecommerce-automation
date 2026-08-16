@@ -25,20 +25,28 @@ export async function registerWithRetry(
   registerationPage,
   { overrides = {}, tag = "", attempts = 3 } = {},
 ) {
-  // Each attempt can take up to ~30s (waiting on a known-flaky modal), so
-  // 3 attempts can need 90+ seconds — well past Playwright's default 30s
-  // TEST timeout, which would otherwise kill the whole test mid-retry
-  // regardless of attempts remaining. Extend it to actually fit the retry
-  // budget. Wrapped in try/catch because globalSetup.js also calls this
+  // Each attempt can take ~30s (waiting on a known-flaky modal) plus form
+  // fill/submit time. Budget the worst case PLUS a buffer, so a full set of
+  // genuine failures throws the real error instead of the harness killing
+  // the test mid-action (which surfaces as a confusing "page has been
+  // closed"). Wrapped in try/catch because globalSetup.js also calls this
   // function OUTSIDE any test() context, where test.setTimeout() throws.
   try {
-    test.setTimeout(attempts * 35_000);
+    test.setTimeout(attempts * 35_000 + 20_000);
   } catch {
     // Not running inside a test (e.g. called from globalSetup) — no test
     // timeout to extend, nothing to do here.
   }
 
   for (let attempt = 1; attempt <= attempts; attempt++) {
+    // A failed attempt can leave the form half-submitted / in an error
+    // state, so start every retry from a freshly reloaded register page
+    // instead of re-filling on top of the poisoned one.
+    if (attempt > 1) {
+      await registerationPage.page.reload({ waitUntil: "domcontentloaded" });
+      await registerationPage.registerButton.waitFor();
+    }
+
     const user = { ...generateRegistrationData(), ...overrides };
     const suffix = tag ? `${tag}.a${attempt}` : `a${attempt}`;
     user.email = user.email.replace("@test.com", `.${suffix}@test.com`);
