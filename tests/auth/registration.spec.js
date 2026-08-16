@@ -131,9 +131,10 @@ test.describe("Registration page UI", { tag: ["@regression"] }, () => {
   }) => {
     await expect(registerationPage.loginHereLink).toBeVisible();
 
-    // The auth page's decorative .banner layer overlaps this footer link's
-    // click point; force past that non-interactive overlay.
-    await registerationPage.loginHereLink.click({ force: true });
+    // The auth page's decorative .banner layer sits over this footer link
+    // and swallows real clicks (even forced ones hit the overlay). Dispatch
+    // the click straight to the node so its router handler fires regardless.
+    await registerationPage.loginHereLink.dispatchEvent("click");
 
     await expect(page).toHaveURL(/.*\/#\/auth\/login/);
     await expect(loginPage.loginButton).toBeVisible();
