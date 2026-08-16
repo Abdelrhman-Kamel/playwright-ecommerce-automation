@@ -12,7 +12,9 @@ export class RegisterationPage {
     });
     this.ageConsent = page.getByRole("checkbox");
     this.registerButton = page.getByRole("button", { name: "Register" });
-    this.loginHereLink = page.getByText("Login here");
+    this.loginHereLink = page.locator(
+      'p:has-text("Already have an account? Login here")',
+    );
     // Post-registration success modal elements
     this.accountCreatedMsg = page.getByText("Account Created Successfully");
     this.loginAfterRegisterBtn = page.getByRole("button", { name: "Login" });
