@@ -12,7 +12,8 @@ permissions:
   pages: write
   id-token: write
 
-# Serialize Pages deploys so overlapping runs don't race each other.
+# Prevents overlapping Pages deployments if two pushes land close together —
+# GitHub rejects/races concurrent deploys to the same Pages site otherwise.
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -27,10 +28,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: npm
+          cache: "npm"
 
-      # allure-commandline needs a JRE to generate the report.
-      - uses: actions/setup-java@v4
+      # allure-commandline needs a JRE. ubuntu-latest currently ships one
+      # preinstalled, but relying on that implicitly is fragile — pin it
+      # explicitly so report generation doesn't silently break if GitHub
+      # changes the runner image later.
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -38,8 +42,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Only chromium is installed here — CI runs the fast chromium-only
-      # @regression pass on every push/PR. Full cross-browser coverage
+      # Only chromium is installed here — CI currently runs chromium-only
+      # for speed. Full cross-browser coverage (firefox, webkit) can be run
+      # locally via `npm run test` (no --project filter), or added as a
+      # separate scheduled workflow later if needed — no such workflow
+      # exists yet as of this file.
       - name: Install Playwright Browsers (chromium only)
         run: npx playwright install --with-deps chromium
 
