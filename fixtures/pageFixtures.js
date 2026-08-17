@@ -70,7 +70,7 @@ export const test = base.extend({
   },
 
   homePage: async ({ poManager }, use) => {
-    await use(poManager.getDashboardPage());
+    await use(poManager.getHomePage());
   },
 
   cartPage: async ({ poManager }, use) => {
