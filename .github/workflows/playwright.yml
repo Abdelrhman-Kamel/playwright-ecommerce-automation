@@ -85,6 +85,27 @@ jobs:
           }
           EOF_INNER
 
+      # GitHub Pages deployments completely replace the site's contents on
+      # every deploy — unlike the Allure Jenkins Plugin, which manages
+      # build history internally, there's no persistent storage here
+      # holding the previous run's history/ folder. Without this, Trend
+      # data can never accumulate no matter how many times CI runs. Fix:
+      # pull the previous run's history files directly from the live
+      # Pages site (that site IS the last report, so its history/ files
+      # are already publicly there) before generating the new one.
+      # `|| true` on each line means a first-ever run (no history yet,
+      # 404s expected) doesn't fail the step.
+      - name: Restore previous Allure history for Trend data
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p allure-results/history
+          BASE="https://abdulrahman-kamell.github.io/playwright-ecommerce-automation/history"
+          curl -sf "$BASE/history.json" -o allure-results/history/history.json || true
+          curl -sf "$BASE/history-trend.json" -o allure-results/history/history-trend.json || true
+          curl -sf "$BASE/duration-trend.json" -o allure-results/history/duration-trend.json || true
+          curl -sf "$BASE/retry-trend.json" -o allure-results/history/retry-trend.json || true
+          curl -sf "$BASE/categories-trend.json" -o allure-results/history/categories-trend.json || true
+
       - name: Generate Allure report
         if: ${{ !cancelled() }}
         run: npm run allure:generate
