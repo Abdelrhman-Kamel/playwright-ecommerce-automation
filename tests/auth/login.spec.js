@@ -60,21 +60,22 @@ test.describe("Login", { tag: ["@regression"] }, () => {
       .waitFor({ state: "visible", timeout: 5000 });
   });
 
-  test("login is case-insensitive for email", async ({
-    loginPage,
-    homePage,
-  }) => {
-    test.fail(
-      true,
-      "Bug found via automation: login is case-sensitive on email, should not be.",
-    );
-    await loginPage.login(
-      credentials.username.toUpperCase(),
-      credentials.password,
-    );
+  test(
+    "login is case-insensitive for email",
+    { tag: ["@known-issue"] },
+    async ({ loginPage, homePage }) => {
+      test.fail(
+        true,
+        "Bug found via automation: login is case-sensitive on email, should not be.",
+      );
+      await loginPage.login(
+        credentials.username.toUpperCase(),
+        credentials.password,
+      );
 
-    await expect(homePage.products.first()).toBeVisible();
-  });
+      await expect(homePage.products.first()).toBeVisible();
+    },
+  );
 
   test("login is case-sensitive for password", async ({ page, loginPage }) => {
     await loginPage.userNameInput.fill(credentials.username);

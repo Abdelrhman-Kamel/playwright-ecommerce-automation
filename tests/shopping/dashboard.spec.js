@@ -88,17 +88,21 @@ test.describe("Dashboard - Search", { tag: ["@regression"] }, () => {
     await expect(homePage.products).toHaveCount(totalBefore);
   });
 
-  test("search is case-insensitive", async ({ homePage }) => {
-    test.fail(
-      true,
-      "Bug found via automation: search returns no results when query case doesn't match product name casing.",
-    );
-    await homePage.searchProduct("zara");
+  test(
+    "search is case-insensitive",
+    { tag: ["@known-issue"] },
+    async ({ homePage }) => {
+      test.fail(
+        true,
+        "Bug found via automation: search returns no results when query case doesn't match product name casing.",
+      );
+      await homePage.searchProduct("zara");
 
-    await expect(homePage.products.first()).toContainText("zara", {
-      ignoreCase: true,
-    });
-  });
+      await expect(homePage.products.first()).toContainText("zara", {
+        ignoreCase: true,
+      });
+    },
+  );
 });
 
 // ---------------------------------------------------------------------------
