@@ -181,4 +181,4 @@ Two real application defects were discovered while building this suite — not p
 
 - **`OrderDetailsPage` vs `OrderViewPage`** — the immediate post-checkout confirmation page and the "Orders → View" detail page turned out to be two genuinely different templates (confirmed by inspecting real DOM, not assumed), so they're modeled as two separate page objects rather than one page object incorrectly trying to represent both.
 - **Deterministic waits over `networkidle`** — `waitForLoadState("networkidle")` proved unreliable on this site (a persistent third-party banner script keeps network activity going indefinitely). Replaced throughout with waits tied to specific outcomes — element visibility, URL changes, or count changes — matching what each action actually needs to confirm.
-- **Fresh accounts per worker, not a shared login** — avoids the cross-test data races that come from multiple parallel workers acting on one shared cart/order history.# playwright-ecommerce-automation
+- **Fresh accounts per worker, not a shared login** — avoids the cross-test data races that come from multiple parallel workers acting on one shared cart/order history.
