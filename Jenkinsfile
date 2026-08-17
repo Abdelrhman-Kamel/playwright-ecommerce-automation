@@ -60,7 +60,7 @@ pipeline {
             // Publishes the Allure report natively inside Jenkins' UI,
             // reading from the same allure-results/ folder the
             // allure-playwright reporter already writes to.
-            allure includeProperties: false, results: [[path: 'allure-results']]
+            allure commandline: 'allure', includeProperties: false, jdk: '', resultPolicy: 'LEAVE_AS_IS', results: [[path: 'allure-results']]
 
             // Keep Playwright's own HTML report too, downloadable as a
             // build artifact — same dual-report approach as CI.
