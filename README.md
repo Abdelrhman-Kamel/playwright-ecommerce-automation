@@ -64,7 +64,7 @@ flowchart LR
 playwright-ecommerce-automation/
 ├── .github/workflows/
 │   └── playwright.yml        # CI: chromium-only regression + Allure → GitHub Pages
-├── Jenkinsfile                # Matching Jenkins pipeline with native Allure reporting
+├── Jenkinsfile                # Matching pipeline: chromium-only regression + native Allure
 ├── constants/
 │   └── routes.js              # Centralized route paths (single source of truth)
 ├── fixtures/
