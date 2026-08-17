@@ -99,7 +99,7 @@ jobs:
         if: ${{ !cancelled() }}
         run: |
           mkdir -p allure-results/history
-          BASE="https://abdulrahman-kamell.github.io/playwright-ecommerce-automation/history"
+          BASE="https://abdelrhman-kamel.github.io/playwright-ecommerce-automation/history"
           curl -sf "$BASE/history.json" -o allure-results/history/history.json || true
           curl -sf "$BASE/history-trend.json" -o allure-results/history/history-trend.json || true
           curl -sf "$BASE/duration-trend.json" -o allure-results/history/duration-trend.json || true

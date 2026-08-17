@@ -1,13 +1,13 @@
 # playwright-ecommerce-automation
 
-[![Playwright Tests](https://github.com/Abdulrahman-Kamell/playwright-ecommerce-automation/actions/workflows/playwright.yml/badge.svg)](https://github.com/Abdulrahman-Kamell/playwright-ecommerce-automation/actions/workflows/playwright.yml)
+[![Playwright Tests](https://github.com/Abdelrhman-Kamel/playwright-ecommerce-automation/actions/workflows/playwright.yml/badge.svg)](https://github.com/Abdelrhman-Kamel/playwright-ecommerce-automation/actions/workflows/playwright.yml)
 ![Tests](https://img.shields.io/badge/tests-67%20passing%20%C2%B7%202%20known%20issues-brightgreen)
 ![Playwright](https://img.shields.io/badge/Playwright-1.61-2EAD33?logo=playwright&logoColor=white)
 ![Node](https://img.shields.io/badge/node-LTS-339933?logo=node.js&logoColor=white)
 ![Allure](https://img.shields.io/badge/reporting-Allure-orange)
 ![License](https://img.shields.io/badge/license-ISC-blue)
 
-**[📊 Live Allure Report](https://abdulrahman-kamell.github.io/playwright-ecommerce-automation/)** · **[⚙️ CI Workflow](https://github.com/Abdulrahman-Kamell/playwright-ecommerce-automation/actions)** · **[🛒 App Under Test](https://rahulshettyacademy.com/client/)**
+**[📊 Live Allure Report](https://abdelrhman-kamel.github.io/playwright-ecommerce-automation/)** · **[⚙️ CI Workflow](https://github.com/Abdelrhman-Kamel/playwright-ecommerce-automation/actions)** · **[🛒 App Under Test](https://rahulshettyacademy.com/client/)**
 
 An end-to-end test automation framework for an e-commerce site ([Rahul Shetty Academy's practice app](https://rahulshettyacademy.com/client/)), built to demonstrate production-grade Playwright practices: page object architecture, worker-isolated authentication, API-level security testing, and dual CI/CD pipelines with rich reporting.
 
@@ -108,7 +108,7 @@ playwright-ecommerce-automation/
 ### Setup
 
 ```bash
-git clone https://github.com/Abdulrahman-Kamell/playwright-ecommerce-automation.git
+git clone https://github.com/Abdelrhman-Kamel/playwright-ecommerce-automation.git
 cd playwright-ecommerce-automation
 npm install
 ```
@@ -152,7 +152,7 @@ npm run allure:open         # open it in your browser
 
 **GitHub Actions** — triggers on every push/PR to `main` or `master`. Runs the chromium-only `@regression` suite, then generates and deploys an Allure report to GitHub Pages:
 
-📊 **[Live report](https://abdulrahman-kamell.github.io/playwright-ecommerce-automation/)**
+📊 **[Live report](https://abdelrhman-kamel.github.io/playwright-ecommerce-automation/)**
 
 **Jenkins** — a Declarative Pipeline (`Jenkinsfile`) mirroring the same test scope, with native Allure report rendering inside Jenkins' own UI, plus job-level timeout, concurrent-build protection, and build/artifact retention limits. The job polls GitHub for changes on a schedule (configured in the Jenkins job itself, not the `Jenkinsfile` — a local Jenkins instance can't receive GitHub webhooks without a public endpoint, so polling is the practical alternative).
 
@@ -160,7 +160,7 @@ Both pipelines set `CI=true` explicitly so `playwright.config.js`'s environment-
 
 <!--
   TODO: Replace with a real screenshot of the Allure dashboard.
-  1. Take a screenshot of https://abdulrahman-kamell.github.io/playwright-ecommerce-automation/
+  1. Take a screenshot of https://abdelrhman-kamel.github.io/playwright-ecommerce-automation/
   2. Save it to a new `docs/` folder as `allure-overview.png`
   3. Uncomment the line below
 -->
