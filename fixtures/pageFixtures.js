@@ -26,6 +26,18 @@ export const test = base.extend({
         if (tag === "@smoke") allure.epic("Smoke Suite");
         if (tag === "@regression") allure.epic("Regression Suite");
         if (tag === "@security") allure.feature("Security");
+        if (tag === "@known-issue") {
+          // These tests use test.fail() to document real bugs found via
+          // automation. Playwright counts an expected failure as an
+          // overall "pass" (that's the point — CI stays green rather than
+          // blocking on an already-known issue), which means Allure's own
+          // pass/fail status can't be used to distinguish them from an
+          // ordinary passing test. Grouping them into their own feature +
+          // marking severity here makes them visually distinct in the
+          // report regardless of that pass/fail status quirk.
+          allure.feature("Known Issues (tracked via test.fail())");
+          allure.severity("minor");
+        }
       }
       await use();
     },
@@ -58,7 +70,7 @@ export const test = base.extend({
   },
 
   homePage: async ({ poManager }, use) => {
-    await use(poManager.getHomePage());
+    await use(poManager.getDashboardPage());
   },
 
   cartPage: async ({ poManager }, use) => {
