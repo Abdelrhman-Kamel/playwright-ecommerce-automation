@@ -5,6 +5,7 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch: # adds a "Run workflow" button on the Actions tab for manual triggers
 
 # Needed for the GitHub Pages deploy step below.
 permissions:
