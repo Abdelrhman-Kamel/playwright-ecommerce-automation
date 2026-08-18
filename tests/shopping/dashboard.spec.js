@@ -1,5 +1,6 @@
 import { test, expect } from "../../fixtures/pageFixtures";
 import { ROUTES } from "../../constants/routes";
+import AxeBuilder from "@axe-core/playwright";
 
 // ---------------------------------------------------------------------------
 // Shared setup — navigate to dashboard (already authenticated)
@@ -35,6 +36,23 @@ test.describe("Dashboard - Product listing", { tag: ["@regression"] }, () => {
       firstCard.getByRole("button", { name: "Add To Cart" }),
     ).toBeVisible();
     await expect(firstCard.getByRole("button", { name: "View" })).toBeVisible();
+  });
+
+  test("visual regression: dashboard page layout", async ({ page }) => {
+    await expect(page).toHaveScreenshot("home-page.png");
+  });
+
+  test("accessibility: dashboard page has no WCAG 2.1 AA violations", async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      "Bug found via automation: product images have no alt text, filter checkboxes have no labels, plus color-contrast failures on banner/pagination — axe rules 'image-alt', 'label', 'color-contrast', WCAG 2.1 AA.",
+    );
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(results.violations).toEqual([]);
   });
 });
 

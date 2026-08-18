@@ -1,5 +1,6 @@
 import { test, expect } from "../../fixtures/pageFixtures";
 import { ROUTES } from "../../constants/routes";
+import AxeBuilder from "@axe-core/playwright";
 
 const CHECKOUT = {
   cardNumber: "4542 9931 9292 2293",
@@ -144,5 +145,44 @@ test.describe("Checkout flow", { tag: ["@regression"] }, () => {
 
     const billing = await orderViewPage.getBillingDetails();
     expect(billing.country).toContain(CHECKOUT.country);
+  });
+
+  test("visual regression: checkout page layout", async ({
+    page,
+    checkoutPage,
+  }) => {
+    await checkoutPage.fillCreditCardDetails(
+      CHECKOUT.cardNumber,
+      CHECKOUT.month,
+      CHECKOUT.year,
+      CHECKOUT.cvv,
+      CHECKOUT.nameOnCard,
+    );
+    await checkoutPage.selectCountry(CHECKOUT.country);
+
+    await expect(page).toHaveScreenshot("checkout-page.png");
+  });
+
+  test("accessibility: checkout page has no WCAG 2.1 AA violations", async ({
+    page,
+    checkoutPage,
+  }) => {
+    test.fail(
+      true,
+      "Bug found via automation: checkout form inputs and dropdowns have no labels, plus color-contrast failures on banner/price/payment options/place-order button — axe rules 'label', 'select-name', 'color-contrast', WCAG 2.1 AA.",
+    );
+    await checkoutPage.fillCreditCardDetails(
+      CHECKOUT.cardNumber,
+      CHECKOUT.month,
+      CHECKOUT.year,
+      CHECKOUT.cvv,
+      CHECKOUT.nameOnCard,
+    );
+    await checkoutPage.selectCountry(CHECKOUT.country);
+
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(results.violations).toEqual([]);
   });
 });

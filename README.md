@@ -1,7 +1,7 @@
 # playwright-ecommerce-automation
 
 [![Playwright Tests](https://github.com/Abdelrhman-Kamel/playwright-ecommerce-automation/actions/workflows/playwright.yml/badge.svg)](https://github.com/Abdelrhman-Kamel/playwright-ecommerce-automation/actions/workflows/playwright.yml)
-![Tests](https://img.shields.io/badge/tests-67%20passing%20%C2%B7%202%20known%20issues-brightgreen)
+![Tests](https://img.shields.io/badge/tests-71%20passing%20%C2%B7%206%20known%20issues-brightgreen)
 ![Playwright](https://img.shields.io/badge/Playwright-1.61-2EAD33?logo=playwright&logoColor=white)
 ![Node](https://img.shields.io/badge/node-LTS-339933?logo=node.js&logoColor=white)
 ![Allure](https://img.shields.io/badge/reporting-Allure-orange)
@@ -11,7 +11,7 @@
 
 An end-to-end test automation framework for an e-commerce site ([Rahul Shetty Academy's practice app](https://rahulshettyacademy.com/client/)), built to demonstrate production-grade Playwright practices: page object architecture, worker-isolated authentication, API-level security testing, and dual CI/CD pipelines with rich reporting.
 
-**69 tests** across UI, API, and security layers — **67 passing, 2 tracked known issues** (real bugs found via automation, see [below](#known-issues-found-via-automation)) — organized by feature domain, tagged for selective execution, and running clean in both GitHub Actions and Jenkins.
+**77 tests** across UI, API, security, visual regression, and accessibility layers — **71 passing, 6 tracked known issues** (real bugs found via automation, see [below](#known-issues-found-via-automation)) — organized by feature domain, tagged for selective execution, and running clean in both GitHub Actions and Jenkins.
 
 ---
 
@@ -39,7 +39,8 @@ flowchart LR
 - **Resilience against real external flakiness** — a retry wrapper (`registerWithRetry`) tolerates the practice site's known-flaky registration endpoint without masking genuine failures, generating fresh credentials on each retry rather than resubmitting a possibly-already-created account
 - **API-level security testing** — a dedicated suite (`tests/security/`) that logs in via raw API calls (not the UI) to test authorization boundaries, including a cross-account access test that creates a fresh order on a separate, pre-configured account on the fly, rather than depending on a hardcoded, externally-owned order ID
 - **Network-level API mocking** — a test that simulates an empty-orders state by intercepting and replacing the real API response, without needing to manually clear real data first
-- **Two real bugs found and documented** via automation, not assumed — see [Known Issues](#known-issues-found-via-automation) below
+- **Real bugs found and documented** via automation — 2 functional defects and a full WCAG 2.1 AA accessibility audit finding, see [Known Issues](#known-issues-found-via-automation) below
+- **Visual regression and accessibility testing** — Playwright's native screenshot comparison plus `@axe-core/playwright` WCAG 2.1 AA scans across key pages
 - **Dual CI/CD**: GitHub Actions (chromium-only regression pass on every push, deploying a live Allure report to GitHub Pages) and Jenkins (matching pipeline, native in-Jenkins Allure reporting, polling-based triggers)
 - **Allure reporting** with automatic environment metadata, executor tracking, and epic/feature tagging derived from test tags
 
@@ -170,10 +171,21 @@ Both pipelines set `CI=true` explicitly so `playwright.config.js`'s environment-
 
 ## Known issues (found via automation)
 
-Two real application defects were discovered while building this suite — not pre-known bugs, but issues the automation itself caught. Both are documented in code via Playwright's `test.fail()` annotation (the tests still run every time; a failure is the _expected_, tracked outcome, and the suite would immediately flag it if either bug were ever silently fixed):
+Real application defects discovered while building this suite — not pre-known bugs, but issues the automation itself caught. All are documented in code via Playwright's `test.fail()` annotation: the tests still run every time, a failure is the _expected_, tracked outcome, and the suite would immediately flag it if any of these were ever silently fixed.
+
+**Functional bugs**
 
 1. **Login is case-sensitive on email** — most platforms treat email as case-insensitive for login; this one requires an exact case match against how the account was originally registered.
 2. **Product search doesn't match case-insensitively** — searching a lowercase term returns zero results even when a matching product exists with different casing.
+
+**Accessibility audit (WCAG 2.1 AA)** — added `@axe-core/playwright` scans across the login, dashboard, cart, and checkout pages. Every page failed, split across two categories:
+
+| Category                                                                    | Impact                                                                    | Found on    | Example                                                                                                                                                                                                   |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Missing accessible names (`label`, `select-name`, `image-alt`, `link-name`) | **Critical/Serious** — screen readers announce nothing for these elements | All 4 pages | Checkout's credit card, name, and coupon inputs have no `<label>`; product images have no `alt` text; social media icons have no accessible text                                                          |
+| Insufficient color contrast (`color-contrast`)                              | **Serious**                                                               | All 4 pages | The site-wide "Get Shortlisted by Recruiters" banner — confirmed manually, and additionally animates/blinks without a way to pause it (a separate WCAG 2.2.2 concern automated scans don't fully capture) |
+
+The missing-accessible-names findings are the more severe of the two — a screen reader user filling out the checkout form would hear "edit text" with no indication of which field is which.
 
 ---
 

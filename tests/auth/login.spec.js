@@ -1,6 +1,7 @@
 import { test, expect } from "../../fixtures/pageFixtures";
 import { getLoginCredentials } from "../../utils/testData";
 import { ROUTES } from "../../constants/routes";
+import AxeBuilder from "@axe-core/playwright";
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -137,5 +138,22 @@ test.describe("Login page UI", { tag: ["@regression"] }, () => {
 
     await expect(page).toHaveURL(/.*\/#\/auth\/register/);
     await expect(page.getByRole("button", { name: "Register" })).toBeVisible();
+  });
+
+  test("visual regression: login page layout", async ({ page }) => {
+    await expect(page).toHaveScreenshot("login-page.png");
+  });
+
+  test("accessibility: login page has no WCAG 2.1 AA violations", async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      "Bug found via automation: social media icon links (Facebook, Instagram, Twitter, YouTube) have no accessible name — axe rule 'link-name', WCAG 2.1 AA.",
+    );
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(results.violations).toEqual([]);
   });
 });

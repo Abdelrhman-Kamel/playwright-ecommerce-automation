@@ -1,5 +1,6 @@
 import { test, expect } from "../../fixtures/pageFixtures";
 import { ROUTES } from "../../constants/routes";
+import AxeBuilder from "@axe-core/playwright";
 
 // ---------------------------------------------------------------------------
 // Cart management — adding, removing, and navigating from the cart
@@ -149,5 +150,42 @@ test.describe("Cart management", { tag: ["@regression"] }, () => {
     await sideBar.navigateToCartPage();
 
     await expect(cartPage.checkoutButton).toBeVisible();
+  });
+
+  test("visual regression: cart page layout", async ({
+    page,
+    homePage,
+    sideBar,
+  }) => {
+    const productName = (
+      await homePage.products.first().locator("b").textContent()
+    ).trim();
+
+    await homePage.addProductToCart(productName);
+    await sideBar.navigateToCartPage();
+
+    await expect(page).toHaveScreenshot("cart-page.png");
+  });
+
+  test("accessibility: cart page has no WCAG 2.1 AA violations", async ({
+    page,
+    homePage,
+    sideBar,
+  }) => {
+    test.fail(
+      true,
+      "Bug found via automation: header tagline and recruiter banner fail color-contrast minimums — axe rule 'color-contrast', WCAG 2.1 AA.",
+    );
+    const productName = (
+      await homePage.products.first().locator("b").textContent()
+    ).trim();
+
+    await homePage.addProductToCart(productName);
+    await sideBar.navigateToCartPage();
+
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
+    expect(results.violations).toEqual([]);
   });
 });
