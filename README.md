@@ -1,7 +1,7 @@
 # playwright-ecommerce-automation
 
 [![Playwright Tests](https://github.com/Abdelrhman-Kamel/playwright-ecommerce-automation/actions/workflows/playwright.yml/badge.svg)](https://github.com/Abdelrhman-Kamel/playwright-ecommerce-automation/actions/workflows/playwright.yml)
-![Tests](https://img.shields.io/badge/tests-71%20passing%20%C2%B7%206%20known%20issues-brightgreen)
+![Tests](https://img.shields.io/badge/tests-70%20passing%20%C2%B7%206%20known%20issues-brightgreen)
 ![Playwright](https://img.shields.io/badge/Playwright-1.61-2EAD33?logo=playwright&logoColor=white)
 ![Node](https://img.shields.io/badge/node-LTS-339933?logo=node.js&logoColor=white)
 ![Allure](https://img.shields.io/badge/reporting-Allure-orange)
@@ -11,7 +11,7 @@
 
 An end-to-end test automation framework for an e-commerce site ([Rahul Shetty Academy's practice app](https://rahulshettyacademy.com/client/)), built to demonstrate production-grade Playwright practices: page object architecture, worker-isolated authentication, API-level security testing, and dual CI/CD pipelines with rich reporting.
 
-**77 tests** across UI, API, security, visual regression, and accessibility layers — **71 passing, 6 tracked known issues** (real bugs found via automation, see [below](#known-issues-found-via-automation)) — organized by feature domain, tagged for selective execution, and running clean in both GitHub Actions and Jenkins.
+**76 tests** across UI, API, security, visual regression, and accessibility layers — **70 passing, 6 tracked known issues** (real bugs found via automation, see [below](#known-issues-found-via-automation)) — organized by feature domain, tagged for selective execution, and running clean in both GitHub Actions and Jenkins.
 
 ---
 
@@ -40,7 +40,8 @@ flowchart LR
 - **API-level security testing** — a dedicated suite (`tests/security/`) that logs in via raw API calls (not the UI) to test authorization boundaries, including a cross-account access test that creates a fresh order on a separate, pre-configured account on the fly, rather than depending on a hardcoded, externally-owned order ID
 - **Network-level API mocking** — a test that simulates an empty-orders state by intercepting and replacing the real API response, without needing to manually clear real data first
 - **Real bugs found and documented** via automation — 2 functional defects and a full WCAG 2.1 AA accessibility audit finding, see [Known Issues](#known-issues-found-via-automation) below
-- **Visual regression and accessibility testing** — Playwright's native screenshot comparison plus `@axe-core/playwright` WCAG 2.1 AA scans across key pages
+- **Visual regression testing** on dashboard, cart, and checkout — using masking and a small pixel-diff tolerance to handle known dynamic content (an animating promo banner, per-run randomized account data) without losing real regression coverage. Deliberately _not_ run on the login page — its hero section rotates through multiple unrelated background/content variants on load, making full-page pixel comparison structurally unreliable there rather than just occasionally flaky
+- **Accessibility testing** — `@axe-core/playwright` WCAG 2.1 AA scans across all 4 key pages (login, dashboard, cart, checkout)
 - **Dual CI/CD**: GitHub Actions (chromium-only regression pass on every push, deploying a live Allure report to GitHub Pages) and Jenkins (matching pipeline, native in-Jenkins Allure reporting, polling-based triggers)
 - **Allure reporting** with automatic environment metadata, executor tracking, and epic/feature tagging derived from test tags
 
@@ -48,14 +49,16 @@ flowchart LR
 
 ## Tech stack
 
-| Layer       | Tool                                                                             |
-| ----------- | -------------------------------------------------------------------------------- |
-| Test runner | [Playwright](https://playwright.dev/) (`@playwright/test`)                       |
-| Language    | JavaScript (ES modules)                                                          |
-| Test data   | [`@faker-js/faker`](https://fakerjs.dev/)                                        |
-| Reporting   | [Allure](https://allurereport.org/) (`allure-playwright` + `allure-commandline`) |
-| CI/CD       | GitHub Actions, Jenkins (Declarative Pipeline)                                   |
-| Env config  | `dotenv`                                                                         |
+| Layer                 | Tool                                                                                       |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| Test runner           | [Playwright](https://playwright.dev/) (`@playwright/test`)                                 |
+| Language              | JavaScript (ES modules)                                                                    |
+| Test data             | [`@faker-js/faker`](https://fakerjs.dev/)                                                  |
+| Accessibility testing | [`@axe-core/playwright`](https://www.npmjs.com/package/@axe-core/playwright) (WCAG 2.1 AA) |
+| Visual regression     | Playwright native (`toHaveScreenshot()`)                                                   |
+| Reporting             | [Allure](https://allurereport.org/) (`allure-playwright` + `allure-commandline`)           |
+| CI/CD                 | GitHub Actions, Jenkins (Declarative Pipeline)                                             |
+| Env config            | `dotenv`                                                                                   |
 
 ---
 
@@ -194,3 +197,4 @@ The missing-accessible-names findings are the more severe of the two — a scree
 - **`OrderDetailsPage` vs `OrderViewPage`** — the immediate post-checkout confirmation page and the "Orders → View" detail page turned out to be two genuinely different templates (confirmed by inspecting real DOM, not assumed), so they're modeled as two separate page objects rather than one page object incorrectly trying to represent both.
 - **Deterministic waits over `networkidle`** — `waitForLoadState("networkidle")` proved unreliable on this site (a persistent third-party banner script keeps network activity going indefinitely). Replaced throughout with waits tied to specific outcomes — element visibility, URL changes, or count changes — matching what each action actually needs to confirm.
 - **Fresh accounts per worker, not a shared login** — avoids the cross-test data races that come from multiple parallel workers acting on one shared cart/order history.
+- **Visual regression scoped to pages where it's actually meaningful** — rather than forcing full-page screenshot comparison everywhere, the login page was deliberately excluded once its hero section proved to rotate through multiple unrelated background/content variants on load. Masking and pixel tolerance solve _localized_ instability (an animating banner, variable-length account data); they don't solve "half the page is randomly different content," so the honest choice was to not run that comparison there rather than weaken it into a test that no longer verifies anything meaningful.
