@@ -141,7 +141,9 @@ test.describe("Login page UI", { tag: ["@regression"] }, () => {
   });
 
   test("visual regression: login page layout", async ({ page }) => {
-    await expect(page).toHaveScreenshot("login-page.png");
+    await expect(page).toHaveScreenshot("login-page.png", {
+      mask: [page.locator(".blinkingText")],
+    });
   });
 
   test("accessibility: login page has no WCAG 2.1 AA violations", async ({

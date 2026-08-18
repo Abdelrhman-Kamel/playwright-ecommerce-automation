@@ -39,7 +39,9 @@ test.describe("Dashboard - Product listing", { tag: ["@regression"] }, () => {
   });
 
   test("visual regression: dashboard page layout", async ({ page }) => {
-    await expect(page).toHaveScreenshot("home-page.png");
+    await expect(page).toHaveScreenshot("home-page.png", {
+      mask: [page.locator(".blinkingText")],
+    });
   });
 
   test("accessibility: dashboard page has no WCAG 2.1 AA violations", async ({

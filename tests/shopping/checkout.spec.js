@@ -160,7 +160,9 @@ test.describe("Checkout flow", { tag: ["@regression"] }, () => {
     );
     await checkoutPage.selectCountry(CHECKOUT.country);
 
-    await expect(page).toHaveScreenshot("checkout-page.png");
+    await expect(page).toHaveScreenshot("checkout-page.png", {
+      mask: [page.locator(".blinkingText")],
+    });
   });
 
   test("accessibility: checkout page has no WCAG 2.1 AA violations", async ({

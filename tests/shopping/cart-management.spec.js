@@ -164,7 +164,9 @@ test.describe("Cart management", { tag: ["@regression"] }, () => {
     await homePage.addProductToCart(productName);
     await sideBar.navigateToCartPage();
 
-    await expect(page).toHaveScreenshot("cart-page.png");
+    await expect(page).toHaveScreenshot("cart-page.png", {
+      mask: [page.locator(".blinkingText")],
+    });
   });
 
   test("accessibility: cart page has no WCAG 2.1 AA violations", async ({
