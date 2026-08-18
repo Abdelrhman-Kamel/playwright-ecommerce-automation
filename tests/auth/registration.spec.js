@@ -61,13 +61,12 @@ test.describe("Registration", { tag: ["@regression"] }, () => {
     loginPage,
     registerationPage,
   }) => {
-    // First registration — genuinely needs to succeed, so it gets the same
-    // retry resilience as every other registration test (known-flaky endpoint).
+    // First registration must actually succeed, so it gets the same retry
+    // resilience as the other tests (flaky endpoint).
     const user = await registerWithRetry(loginPage, registerationPage);
 
-    // Navigate back and re-submit with the SAME email — this one must NOT
-    // be retried, since retrying would generate a fresh email and defeat
-    // the point of testing the duplicate-email error path.
+    // Re-submit the SAME email — do NOT retry here, since a retry would
+    // generate a fresh email and defeat the duplicate-email check.
     await page.goto(ROUTES.register);
     await registerationPage.registerButton.waitFor();
 
@@ -131,9 +130,9 @@ test.describe("Registration page UI", { tag: ["@regression"] }, () => {
   }) => {
     await expect(registerationPage.loginHereLink).toBeVisible();
 
-    // The auth page's decorative .banner layer sits over this footer link
-    // and swallows real clicks (even forced ones hit the overlay). Dispatch
-    // the click straight to the node so its router handler fires regardless.
+    // The decorative .banner layer sits over this footer link and swallows
+    // clicks (even forced ones hit the overlay). Dispatch the click straight
+    // to the node so its router handler fires.
     await registerationPage.loginHereLink.dispatchEvent("click");
 
     await expect(page).toHaveURL(/.*\/#\/auth\/login/);

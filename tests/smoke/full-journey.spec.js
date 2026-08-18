@@ -175,8 +175,7 @@ test.describe(
       await checkoutPage.placeOrder();
 
       // Billing/delivery address only renders on the Orders -> View page,
-      // NOT on the immediate thank-you confirmation page — confirmed by
-      // checking both pages' real DOM. Navigate there first.
+      // not on the thank-you page (checked both DOMs). Go there first.
       const orderId = await orderDetailsPage.getOrderId();
       await sideBar.navigateToOrderPage();
       await ordersPage.viewOrderDetails(orderId);

@@ -8,9 +8,9 @@ pipeline {
     }
 
     environment {
-        // Jenkins doesn't set CI automatically (GitHub Actions does), yet
+        // Jenkins doesn't set CI (GitHub Actions does), but
         // playwright.config.js keys retries/workers/forbidOnly off it and
-        // globalSetup labels the Allure report Environment on it.
+        // globalSetup uses it for the Allure Environment label.
         CI                         = 'true'
         BASE_URL                   = credentials('BASE_URL')
         LOGIN_USERNAME              = credentials('LOGIN_USERNAME')
@@ -34,8 +34,8 @@ pipeline {
             }
         }
 
-        // No --with-deps here (that flag installs Linux apt packages and
-        // isn't relevant on Windows) — just the browser binary itself.
+        // No --with-deps here (it installs Linux apt packages, irrelevant on
+        // Windows) — just the browser binary.
         stage('Install Playwright browsers') {
             steps {
                 bat 'npx playwright install chromium'
@@ -45,9 +45,9 @@ pipeline {
         stage('Run Playwright tests') {
             steps {
                 // catchError lets the pipeline continue into post{} (report
-                // generation/publishing) even if tests fail, instead of
-                // aborting the whole build — same reasoning as the
-                // if: ${{ !cancelled() }} guards in the GitHub Actions workflow.
+                // generation/publishing) even when tests fail, instead of
+                // aborting the build — same idea as the if: ${{ !cancelled() }}
+                // guards in the GitHub Actions workflow.
                 catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                     bat 'npx playwright test --project=chromium --grep @regression'
                 }
@@ -57,13 +57,12 @@ pipeline {
 
     post {
         always {
-            // Publishes the Allure report natively inside Jenkins' UI,
-            // reading from the same allure-results/ folder the
-            // allure-playwright reporter already writes to.
+            // Publish the Allure report inside Jenkins' UI, reading from the
+            // same allure-results/ folder the allure-playwright reporter writes.
             allure commandline: 'allure', includeProperties: false, jdk: '', resultPolicy: 'LEAVE_AS_IS', results: [[path: 'allure-results']]
 
-            // Keep Playwright's own HTML report too, downloadable as a
-            // build artifact — same dual-report approach as CI.
+            // Keep Playwright's own HTML report too, as a downloadable build
+            // artifact — same dual-report approach as CI.
             archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
         }
     }

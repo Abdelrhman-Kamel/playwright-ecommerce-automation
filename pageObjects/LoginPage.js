@@ -15,15 +15,10 @@ export class LoginPage {
     await this.userNameInput.fill(userName);
     await this.passwordInput.fill(password);
     await this.loginButton.click();
-    // Explicit, shorter timeout (successful logins consistently take
-    // ~3-4s) — without this, a genuinely failed login inherits the full
-    // 30s default and eats the whole test's time budget. Playwright then
-    // classifies the overall test as "timedOut" rather than "failed",
-    // which test.fail() does NOT recognize as the expected outcome (only
-    // status: "failed" counts) — causing tests/auth/login.spec.js's
-    // "login is case-insensitive for email" test.fail() test to be
-    // reported as a hard, unexpected failure instead of an accepted
-    // expected failure.
+    // Shorter timeout so a failed login fails clean instead of eating the
+    // full 30s budget. Otherwise Playwright marks the test "timedOut" rather
+    // than "failed", and test.fail() only accepts "failed" — which would flip
+    // the case-insensitive-email known-issue test into a hard failure.
     await this.page.locator(".card-body").first().waitFor({ timeout: 8000 });
   }
 

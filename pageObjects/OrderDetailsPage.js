@@ -1,31 +1,29 @@
 /**
- * Represents the immediate post-checkout "Thankyou for the order" page.
- * This is a DIFFERENT page/template from the order detail page reached
- * via Orders -> View (see OrderViewPage.js) — billing/delivery address
- * only exists on that other page, not here.
+ * The post-checkout "Thankyou for the order" page. Different page/template
+ * from the order detail page reached via Orders -> View (OrderViewPage.js) —
+ * billing/delivery address lives there, not here.
  */
 export class OrderDetailsPage {
   constructor(page) {
     this.page = page;
 
-    // Assertion: confirmation message displayed after a successful order placement
+    // confirmation message shown after a successful order
     this.thankYouMessage = page.getByText("THANKYOU FOR THE ORDER.");
 
-    // Assertion: the placed order ID
+    // the placed order ID
     this.orderIdText = page.locator("td.em-spacer-1 label").last();
 
-    // Action: navigate back to the orders list from the confirmation page
+    // back to the orders list from the confirmation page
     this.viewOrdersButton = page.locator(
       'div[routerlink="/dashboard/myorders"]',
     );
   }
 
-  // The confirmation table nests several <td> wrappers around each product
+  // The confirmation table wraps each product in several nested <td>s
   // (content-wrap > order-summary-box > line-item), and hasText matches
-  // ancestors as well as the element that actually contains the text — so
-  // filtering by "Qty:" alone matched all three nested levels at once
-  // (strict mode violation). ".line-item.product-info-column" is the real,
-  // specific class on the innermost cell, confirmed from the actual DOM.
+  // ancestors too — so filtering on "Qty:" alone hit all three levels
+  // (strict mode violation). .line-item.product-info-column is the actual
+  // innermost cell class, from the real DOM.
   getProductNameCell(productName) {
     return this.page
       .locator("td.line-item.product-info-column")

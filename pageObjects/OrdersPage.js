@@ -14,12 +14,12 @@ export class OrdersPage {
     this.pageHeading = page.getByRole("heading", { name: "Your Orders" });
   }
 
-  // Centralize order-row resolution to avoid duplicated filters.
+  // one place to resolve an order row by ID
   getOrderRow(orderId) {
     return this.orders.filter({ hasText: orderId }).first();
   }
 
-  // Assertion: returns the product name, price, and date for a specific order row.
+  // product name, price, and date for a given order row
   async getOrderDetails(orderId) {
     const row = this.getOrderRow(orderId);
     return {
@@ -30,25 +30,23 @@ export class OrdersPage {
   }
 
   async viewOrderDetails(orderId) {
-    // Use shared row helper for consistent targeting.
     const row = this.getOrderRow(orderId);
     await row.getByRole("button", { name: "View" }).click();
   }
 
   async deleteOrder(orderId) {
-    // Use shared row helper for consistent targeting.
     const row = this.getOrderRow(orderId);
     // Wait for the row to actually render before counting — goToOrders()
-    // only waits for the URL to change, not for the app to finish fetching
-    // and rendering the orders table afterward. Counting too early can
-    // see a still-empty table and capture the wrong baseline.
+    // only waits for the URL to change, not for the orders table to finish
+    // fetching/rendering. Counting too early can catch an empty table and
+    // grab the wrong baseline.
     await row.waitFor({ state: "visible" });
     const countBefore = await this.orders.count();
     await row.getByRole("button", { name: "Delete" }).click();
     await expect(this.orders).toHaveCount(countBefore - 1);
   }
 
-  // Removes all orders from the list. Safe to call on an already-empty list.
+  // clear the orders list; no-op if it's already empty
   async clearOrders() {
     while ((await this.orders.count()) > 0) {
       const countBefore = await this.orders.count();

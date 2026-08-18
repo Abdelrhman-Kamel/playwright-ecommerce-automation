@@ -24,17 +24,17 @@ let foreignOrderId;
 test.beforeAll(async () => {
   const apiContext = await request.newContext({ ignoreHTTPSErrors: true });
 
-  // Primary account: the one that will attempt the unauthorized access.
-  // Needs a real order of its own first, just so there's a "View" button
-  // to click — its own order's ID isn't used directly below.
+  // Primary account: the one that attempts the unauthorized access. Needs
+  // its own real order just so there's a "View" button to click — that
+  // order's ID isn't used directly below.
   const primaryApi = new API_Utils(apiContext, primaryLoginPayLoad);
   await primaryApi.createOrder(createOrderPayload);
   token = await primaryApi.getToken();
 
-  // Secondary account: owns a genuinely separate order, created fresh
-  // here rather than hardcoded to a specific pre-existing ID — removes
-  // the dependency on an external, uncontrolled account/order this test
-  // doesn't own and can't guarantee still exists.
+  // Secondary account: owns a genuinely separate order, created fresh here
+  // rather than hardcoded to a pre-existing ID — removes the dependency on
+  // an external account/order this test doesn't own and can't guarantee
+  // still exists.
   const secondaryApi = new API_Utils(apiContext, secondaryLoginPayLoad);
   foreignOrderId = await secondaryApi.createOrder(createOrderPayload);
 });
@@ -53,9 +53,9 @@ test(
       .getByRole("button", { name: "ORDERS" })
       .click();
 
-    // Intercept the "get order details" request and redirect it to the
-    // secondary account's order ID — simulates a user tampering with the
-    // request to try to view an order that isn't theirs.
+    // Intercept the "get order details" request and swap in the secondary
+    // account's order ID — simulates a user tampering with the request to
+    // view an order that isn't theirs.
     await page.route(
       "https://rahulshettyacademy.com/api/ecom/order/get-orders-details?id=*",
       (route) =>

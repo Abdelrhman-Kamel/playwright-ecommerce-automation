@@ -1,9 +1,7 @@
 /**
- * Centralized route paths for the app under test.
- * Combined with `baseURL` in playwright.config.js via page.goto(ROUTES.x).
- *
- * Keeping these in one place means a route change only needs updating here,
- * not across every spec file that navigates to it.
+ * Route paths for the app under test. Used with `baseURL` from
+ * playwright.config.js via page.goto(ROUTES.x). One place to update when a
+ * route changes, instead of every spec that navigates to it.
  */
 export const ROUTES = {
   login: "#/auth/login",

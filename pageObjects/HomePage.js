@@ -6,28 +6,28 @@ export class HomePage {
       name: "Continue Shopping",
     });
 
-    // Assertion: price label inside each product card (class text-muted, no price-specific class)
+    // price label inside each product card (.text-muted, no price-specific class)
     this.productPrice = page.locator(".card-body .text-muted");
-    // Assertion: "Showing X results" count text (element has id="res")
+    // "Showing X results" count text
     this.resultsCount = page.locator("#res");
 
-    // Filter: search box
+    // search box
     this.searchInput = page.getByPlaceholder("search").last();
-    // Filter: price range inputs
+    // price range inputs
     this.minPriceInput = page.getByPlaceholder("Min Price").last();
     this.maxPriceInput = page.getByPlaceholder("Max Price").last();
-    // Pagination: the ngx-pagination list next/previous items
+    // ngx-pagination next / previous
     this.paginationNext = page.locator(".pagination-next a");
     this.paginationPrev = page.locator(".pagination-previous a");
   }
 
-  // A shared product-card locator to reduce repetition.
+  // resolve a product card by name
   getProductCard(productName) {
     return this.products.filter({ hasText: productName }).first();
   }
 
-  // Filter: returns the checkbox for a specific category, subcategory, or gender filter.
-  // Uses label text matching since checkboxes share the same 'for' attribute value.
+  // checkbox for a category/subcategory/gender filter. Matches on label text
+  // since the checkboxes all share the same 'for' attribute value.
   getCategoryFilterCheckbox(filterName) {
     return this.page
       .locator(".form-group")
@@ -48,7 +48,6 @@ export class HomePage {
   }
 
   async addProductToCart(productName) {
-    // Optimization: remove unused counting and use the shared product-card helper.
     await Promise.all([
       this.page.waitForResponse((res) =>
         res.url().includes("/api/ecom/user/add-to-cart"),
@@ -60,7 +59,6 @@ export class HomePage {
   }
 
   async viewProductDetails(productName) {
-    // Optimization: use direct filtering instead of a full manual scan loop.
     await this.getProductCard(productName)
       .getByRole("button", { name: "View" })
       .click();

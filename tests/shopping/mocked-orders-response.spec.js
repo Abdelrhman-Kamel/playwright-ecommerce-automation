@@ -16,8 +16,8 @@ test.beforeAll(async () => {
   const apiContext = await request.newContext({ ignoreHTTPSErrors: true });
   const api = new API_Utils(apiContext, loginPayLoad);
 
-  // Only a valid session is needed here — no real order required, since
-  // the API response gets fully replaced below regardless of real data.
+  // Just need a valid session — no real order, since the API response is
+  // fully replaced below regardless of real data.
   token = await api.getToken();
 });
 
@@ -30,10 +30,9 @@ test(
     }, token);
     await page.goto("https://rahulshettyacademy.com/client/");
 
-    // Intercept the real orders API response and replace it with a fake
-    // "no orders" payload, regardless of what the account actually has —
-    // verifies the frontend renders the empty state correctly rather than
-    // trusting/crashing on unexpected data shapes.
+    // Replace the real orders response with a fake "no orders" payload,
+    // whatever the account actually has — checks the frontend renders the
+    // empty state instead of crashing on an unexpected data shape.
     await page.route(
       "https://rahulshettyacademy.com/api/ecom/order/get-orders-for-customer/*",
       async (route) => {

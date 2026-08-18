@@ -7,19 +7,15 @@ import { POManager } from "../pageObjects/POManager";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 /**
- * Custom test object that extends Playwright's base `test`.
- * Each key below becomes a fixture you can destructure directly in a test:
+ * Extends Playwright's base `test`. Each key below is a fixture you can
+ * destructure directly in a test:
  *
  *   test('...', async ({ loginPage, homePage }) => { ... })
  */
 export const test = base.extend({
-  // -------------------------------------------------------------------------
-  // Auto-fixture (auto: true) — runs for EVERY test automatically, no
-  // destructuring needed. Maps our existing @smoke/@regression/@security
-  // tags into Allure's epic/feature hierarchy, so the Allure report can
-  // group and filter by them visually without annotating every spec file
-  // individually.
-  // -------------------------------------------------------------------------
+  // Auto-fixture (runs for every test, no destructuring). Maps our
+  // @smoke/@regression/@security tags into Allure's epic/feature hierarchy
+  // so the report can group/filter by them without annotating every spec.
   allureLabels: [
     async ({}, use, testInfo) => {
       for (const tag of testInfo.tags) {
@@ -27,14 +23,12 @@ export const test = base.extend({
         if (tag === "@regression") allure.epic("Regression Suite");
         if (tag === "@security") allure.feature("Security");
         if (tag === "@known-issue") {
-          // These tests use test.fail() to document real bugs found via
-          // automation. Playwright counts an expected failure as an
-          // overall "pass" (that's the point — CI stays green rather than
-          // blocking on an already-known issue), which means Allure's own
-          // pass/fail status can't be used to distinguish them from an
-          // ordinary passing test. Grouping them into their own feature +
-          // marking severity here makes them visually distinct in the
-          // report regardless of that pass/fail status quirk.
+          // These use test.fail() to document real bugs found via
+          // automation. Playwright counts an expected failure as an overall
+          // "pass" (the point — CI stays green rather than blocking on a
+          // known issue), so Allure's pass/fail status can't tell them apart
+          // from an ordinary passing test. Group them into their own feature
+          // and mark severity so they stand out in the report anyway.
           allure.feature("Known Issues (tracked via test.fail())");
           allure.severity("minor");
         }
@@ -44,12 +38,10 @@ export const test = base.extend({
     { auto: true },
   ],
 
-  // -------------------------------------------------------------------------
-  // Picks the storage state file that globalSetup.js created for THIS
-  // worker (.auth/worker-{parallelIndex}.json). This is cheap and test-scoped
-  // — all the actual expensive work (registering + logging in) already
-  // happened once upfront in globalSetup, not here.
-  // -------------------------------------------------------------------------
+  // Picks the storage state file globalSetup.js created for THIS worker
+  // (.auth/worker-{parallelIndex}.json). Cheap and test-scoped — the
+  // expensive part (register + login) already ran once upfront in
+  // globalSetup, not here.
   storageState: async ({}, use, testInfo) => {
     await use(
       path.join(__dirname, `../.auth/worker-${testInfo.parallelIndex}.json`),

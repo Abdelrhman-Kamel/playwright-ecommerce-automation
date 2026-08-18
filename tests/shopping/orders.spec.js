@@ -14,13 +14,11 @@ const CHECKOUT = {
 // Orders list and details
 //
 // Each test places its own order in beforeEach and cleans it up in
-// afterEach — matching the pattern used across checkout.spec.js and
-// full-journey.spec.js. (Previously this block placed one shared order in
-// beforeAll and reused it across tests, but beforeAll only has access to
-// WORKER-scoped fixtures — page, homePage, cartPage, checkoutPage, and
-// orderDetailsPage are all test-scoped, built on top of the per-test
-// `page` fixture, so destructuring them in beforeAll is invalid and
-// throws at runtime, not just a style inconsistency.)
+// afterEach — same pattern as checkout.spec.js and full-journey.spec.js.
+// (This used to place one shared order in beforeAll, but beforeAll only
+// gets WORKER-scoped fixtures; page/homePage/cartPage/checkoutPage/
+// orderDetailsPage are test-scoped, built on the per-test `page`, so
+// destructuring them in beforeAll throws at runtime — not just a style nit.)
 // ---------------------------------------------------------------------------
 test.describe("Orders management", { tag: ["@regression"] }, () => {
   let orderId;
@@ -130,7 +128,7 @@ test.describe("Orders management", { tag: ["@regression"] }, () => {
 // Order deletion — self-contained: places then deletes its own order
 // ---------------------------------------------------------------------------
 test.describe("Orders - delete", { tag: ["@regression"] }, () => {
-  // Remove any orders left behind if the test fails before completing deletion.
+  // Clean up any order left behind if the test fails before deletion.
   test.afterEach(async ({ page, ordersPage }) => {
     await page.goto(ROUTES.orders, { waitUntil: "domcontentloaded" });
     await ordersPage.clearOrders();
@@ -145,7 +143,7 @@ test.describe("Orders - delete", { tag: ["@regression"] }, () => {
     orderDetailsPage,
     ordersPage,
   }) => {
-    // Place a fresh order specifically for this delete test.
+    // Place a fresh order just for this delete test.
     await page.goto(ROUTES.home, { waitUntil: "domcontentloaded" });
     await homePage.products.first().waitFor();
 

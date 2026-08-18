@@ -1,8 +1,7 @@
 /**
- * Represents the order detail page reached via Orders -> View. This is a
- * separate page/template from the immediate post-checkout thank-you page
- * (see OrderDetailsPage.js) — billing and delivery address only render
- * here, confirmed from the real DOM (not present on the thank-you page).
+ * The order detail page reached via Orders -> View. Separate page/template
+ * from the post-checkout thank-you page (OrderDetailsPage.js) — billing and
+ * delivery address only render here (checked against the real DOM).
  */
 export class OrderViewPage {
   constructor(page) {
@@ -16,10 +15,9 @@ export class OrderViewPage {
       has: page.getByText("Delivery Address"),
     });
 
-    // Assertion: product summary — confirmed from the real DOM. Only one
-    // product card renders on this page per order, so a direct class-based
-    // locator is unambiguous here (unlike the thank-you page's nested
-    // table structure, which needed hasText filtering to disambiguate).
+    // Only one product card renders per order here, so a plain class-based
+    // locator is enough — unlike the thank-you page's nested table, which
+    // needed hasText filtering to disambiguate.
     this.productCard = page.locator(".artwork-card");
     this.orderedProductName = this.productCard.locator(".title");
     this.orderedProductPrice = this.productCard.locator(".price");

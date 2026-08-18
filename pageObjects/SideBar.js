@@ -7,7 +7,7 @@ export class SideBar {
     this.ordersButton = page.getByRole("button", { name: "ORDERS" });
     this.cartButton = page.locator('button[routerlink="/dashboard/cart"]');
     this.signOutButton = page.getByRole("button", { name: "Sign Out" });
-    // Assertion: cart badge label showing item count (rendered as a <label> inside the cart button)
+    // cart badge showing the item count (a <label> inside the cart button)
     this.cartItemCount = page.locator(
       'button[routerlink="/dashboard/cart"] label',
     );
@@ -25,9 +25,9 @@ export class SideBar {
     await this.navigateAndWait(this.cartButton, ROUTES.cart);
   }
 
-  // Shared navigation helper: click a button and wait until the URL contains
-  // the expected route fragment. This is state-independent — it confirms the
-  // navigation completed without assuming any data is present on the page.
+  // click a button and wait for the URL to contain the route fragment.
+  // State-independent — confirms navigation happened without assuming any
+  // data is on the page.
   async navigateAndWait(button, routeFragment) {
     await button.click();
     await this.page.waitForURL((url) => url.href.includes(routeFragment));

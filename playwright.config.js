@@ -11,28 +11,26 @@ dotenv.config();
 export default defineConfig({
   testDir: "./tests",
   globalSetup: "./setup/globalSetup.js",
-  /* Raised from 30 s — this demo site has slow API responses. */
+  /* This demo site has slow API responses, hence the default 30s. */
   timeout: 30000,
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry once locally too — this specific site has known, external
-     response flakiness (documented throughout pageObjects/RegisterationPage.js
-     and utils/registerWithRetry.js), so a single local retry cuts down on
-     false failures without hiding genuine bugs (still fails loudly after
-     the retry is exhausted). CI keeps a higher retry count since it's
-     unattended and slower overall. */
+  /* Retry once locally too — this site has external response flakiness
+     (see pageObjects/RegisterationPage.js and utils/registerWithRetry.js),
+     so one local retry cuts false failures without hiding real bugs (still
+     fails loudly once retries are exhausted). CI retries more since it's
+     unattended and slower. */
   retries: process.env.CI ? 2 : 1,
-  /* Keep worker count modest rather than unbounded: each worker registers
-     its own isolated account in globalSetup, so more workers means more
-     concurrent registration traffic against a site we've already found
-     to be flaky under load. CI runners default to 2 vCPUs anyway. */
+  /* Keep worker count modest: each worker registers its own account in
+     globalSetup, so more workers means more concurrent registration traffic
+     against a site that's already flaky under load. CI runners are 2 vCPUs
+     anyway. */
   workers: process.env.CI ? 2 : 2,
-  /* Dual reporter: "list" for readable live terminal output while running,
-     "html" for the full report afterward. open: 'never' stops it from
-     auto-launching a browser tab after every single run — use
-     `npm run test:report` to open it on demand instead. */
+  /* Two reporters: "list" for readable live terminal output, "html" for the
+     full report afterward. open: 'never' stops it auto-launching a browser
+     tab after every run — use `npm run test:report` to open it on demand. */
   reporter: [
     ["list"],
     ["html", { open: "never" }],
@@ -46,30 +44,27 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('')`. */
     baseURL: process.env.BASE_URL,
 
-    /* Explicit, larger viewport — Playwright's default (1280x720) causes
-       this site's sticky recruiter/ad banner to overlap interactive
-       elements (e.g. the "Login here" link) that never overlap at a
-       typical local browser window size. Standardizing on a bigger
-       viewport avoids CI-only failures caused purely by screen size. */
+    /* Bigger viewport than Playwright's default (1280x720). At the default,
+       this site's sticky recruiter/ad banner overlaps interactive elements
+       (e.g. the "Login here" link) that don't overlap at a normal window
+       size — standardizing on a larger viewport avoids CI-only failures
+       caused purely by screen size. */
     viewport: { width: 1920, height: 1080 },
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
 
-    /* Capture a screenshot only when a test actually fails — cheap to
-       keep on, avoids cluttering test-results/ with screenshots from
-       passing runs. */
+    /* Screenshot only on failure — cheap to leave on, keeps test-results/
+       from filling up with screenshots from passing runs. */
     screenshot: "only-on-failure",
 
-    /* Same reasoning as screenshot — only keep video for failures, where
-       it's actually useful for debugging. */
+    /* Same as screenshot: only keep video for failures, where it's useful. */
     video: "retain-on-failure",
   },
 
-  /* Slightly relax the default 5s assertion timeout given this site's
-     known slower-than-typical API response times (see selectCountry's
-     20s waitFor in pageObjects/CheckoutPage.js for the most extreme case,
-     but plenty of ordinary assertions benefit from a bit more headroom too). */
+  /* Bump the default 5s assertion timeout a bit given this site's slow API
+     responses (selectCountry's wait in pageObjects/CheckoutPage.js is the
+     extreme case, but plenty of ordinary assertions want more headroom). */
   expect: {
     timeout: 7000,
   },

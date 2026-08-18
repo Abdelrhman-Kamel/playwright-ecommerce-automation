@@ -2,7 +2,7 @@ export class CheckoutPage {
   constructor(page) {
     this.page = page;
 
-    // Personal information input fields
+    // payment + coupon fields
     this.creditCardInput = this.getInputField("Credit Card Number");
     this.cvvInput = this.getInputField("CVV");
     this.nameOnCardInput = this.getInputField("Name on Card");
@@ -14,14 +14,14 @@ export class CheckoutPage {
     this.applyCouponButton = page.locator("text=Apply Coupon");
     this.placeOrderButton = page.locator("a.action__submit");
 
-    // Assertion: payment method tiles (Credit Card, Paypal, SEPA, Invoice)
+    // payment method tiles (Credit Card, Paypal, SEPA, Invoice)
     this.paymentMethodCreditCard = page.locator(".payment__type--cc");
     this.paymentMethodPaypal = page.getByText("Paypal");
     this.paymentMethodSepa = page.getByText("SEPA");
     this.paymentMethodInvoice = page.getByText("Invoice");
   }
 
-  // Field selector logic in one place to simplify maintenance.
+  // resolve an input by its field label
   getInputField(fieldLabel) {
     return this.page
       .locator(".field")
@@ -39,8 +39,7 @@ export class CheckoutPage {
 
   async selectCountry(countryName) {
     await this.countryInput.pressSequentially(countryName, { delay: 150 });
-    // Typing triggers an autocomplete API call; wait for the loading indicator
-    // to clear before the suggestion button is rendered.
+    // typing fires an autocomplete call; the suggestion button only shows once it resolves
     await this.page.getByRole("button", { name: countryName }).click();
   }
 

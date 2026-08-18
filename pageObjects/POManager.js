@@ -11,12 +11,11 @@ import { SideBar } from "./SideBar.js";
 export class POManager {
   constructor(page) {
     this.page = page;
-    // Cache page object instances to avoid unnecessary re-instantiation.
+    // page objects are built lazily and cached, keyed by name
     this.pageObjects = {};
   }
 
   getRegisterationPage() {
-    // Lazily initialize and reuse the same page object instance.
     if (!this.pageObjects.registerationPage) {
       this.pageObjects.registerationPage = new RegisterationPage(this.page);
     }
@@ -24,7 +23,6 @@ export class POManager {
   }
 
   getLoginPage() {
-    // Lazily initialize and reuse the same page object instance.
     if (!this.pageObjects.loginPage) {
       this.pageObjects.loginPage = new LoginPage(this.page);
     }
@@ -32,7 +30,6 @@ export class POManager {
   }
 
   getHomePage() {
-    // Lazily initialize and reuse the same page object instance.
     if (!this.pageObjects.homePage) {
       this.pageObjects.homePage = new HomePage(this.page);
     }
@@ -40,7 +37,6 @@ export class POManager {
   }
 
   getCartPage() {
-    // Lazily initialize and reuse the same page object instance.
     if (!this.pageObjects.cartPage) {
       this.pageObjects.cartPage = new CartPage(this.page);
     }
@@ -48,7 +44,6 @@ export class POManager {
   }
 
   getCheckoutPage() {
-    // Lazily initialize and reuse the same page object instance.
     if (!this.pageObjects.checkoutPage) {
       this.pageObjects.checkoutPage = new CheckoutPage(this.page);
     }
@@ -56,7 +51,6 @@ export class POManager {
   }
 
   getOrdersPage() {
-    // Lazily initialize and reuse the same page object instance.
     if (!this.pageObjects.ordersPage) {
       this.pageObjects.ordersPage = new OrdersPage(this.page);
     }
@@ -64,7 +58,6 @@ export class POManager {
   }
 
   getSideBar() {
-    // Lazily initialize and reuse the same page object instance.
     if (!this.pageObjects.sideBar) {
       this.pageObjects.sideBar = new SideBar(this.page);
     }
@@ -72,7 +65,6 @@ export class POManager {
   }
 
   getOrderDetailsPage() {
-    // Lazily initialize and reuse the same page object instance.
     if (!this.pageObjects.orderDetailsPage) {
       this.pageObjects.orderDetailsPage = new OrderDetailsPage(this.page);
     }
@@ -80,7 +72,6 @@ export class POManager {
   }
 
   getOrderViewPage() {
-    // Lazily initialize and reuse the same page object instance.
     if (!this.pageObjects.orderViewPage) {
       this.pageObjects.orderViewPage = new OrderViewPage(this.page);
     }

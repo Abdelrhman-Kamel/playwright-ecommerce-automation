@@ -109,11 +109,11 @@ test.describe("Checkout flow", { tag: ["@regression"] }, () => {
     await checkoutPage.selectCountry(CHECKOUT.country);
     await checkoutPage.placeOrder();
 
-    // orderedProductName is now a method (not a static property), since it
-    // needs productName to find the correct row when an order could
-    // contain more than one product. The locator it returns is already
-    // filtered by productName, so we assert visibility rather than
-    // re-checking text content — that would just be testing our own filter.
+    // getProductNameCell is filtered by productName already, so we assert
+    // visibility rather than re-checking the text — that would just be
+    // testing our own filter. It's a method (not a static property) because
+    // it needs productName to find the right row when an order has more than
+    // one product.
     await expect(
       orderDetailsPage.getProductNameCell(productName),
     ).toBeVisible();
@@ -136,9 +136,8 @@ test.describe("Checkout flow", { tag: ["@regression"] }, () => {
     await checkoutPage.selectCountry(CHECKOUT.country);
     await checkoutPage.placeOrder();
 
-    // Billing/delivery address only renders on the Orders -> View page,
-    // NOT on this immediate thank-you confirmation page — confirmed by
-    // manually checking both pages' real DOM. Navigate there first.
+    // Billing/delivery address only renders on the Orders -> View page, not
+    // on this thank-you page (checked both DOMs). Go there first.
     const orderId = await orderDetailsPage.getOrderId();
     await page.goto(ROUTES.orders, { waitUntil: "domcontentloaded" });
     await ordersPage.viewOrderDetails(orderId);

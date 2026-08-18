@@ -9,11 +9,10 @@ export class CartPage {
       name: "Continue Shopping",
     });
 
-    // Assertion: cart page title
     this.cartHeading = page.getByRole("heading", { name: "My Cart" });
-    // Assertion: stock status text inside a cart item (e.g. "In Stock")
+    // stock status inside a cart item, e.g. "In Stock"
     this.stockStatus = page.locator(".stockStatus");
-    // Assertion: subtotal and total price labels in the summary section
+    // subtotal / total rows in the summary
     this.subtotalPrice = page
       .locator(".subtotal .totalRow")
       .nth(0)
@@ -24,7 +23,7 @@ export class CartPage {
       .locator(".value");
   }
 
-  // Centralized product-to-cart-item lookup to avoid duplicated locator chains.
+  // one place to resolve a cart item by product name
   getCartItem(productName) {
     return this.cartItems.filter({ hasText: productName }).first();
   }
@@ -35,7 +34,6 @@ export class CartPage {
   }
 
   async buyProduct(productName) {
-    // Reuse the cart item helper for cleaner and more maintainable selectors.
     await this.getCartItem(productName)
       .getByRole("button", { name: "Buy Now" })
       .click();
@@ -48,7 +46,7 @@ export class CartPage {
     await cartItem.waitFor({ state: "detached" });
   }
 
-  // Removes all items from the cart. Safe to call on an already-empty cart.
+  // clear the cart; no-op if it's already empty
   async clearCart() {
     while ((await this.cartItems.count()) > 0) {
       const countBefore = await this.cartItems.count();

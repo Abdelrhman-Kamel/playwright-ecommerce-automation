@@ -18,38 +18,34 @@ const BASE_URL = process.env.BASE_URL;
 const AUTH_DIR = path.join(__dirname, "../.auth");
 const ALLURE_RESULTS_DIR = path.join(__dirname, "../allure-results");
 
-// Cached worker accounts older than this are re-registered from scratch,
-// rather than trusted indefinitely — guards against a stale/expired
-// session silently causing confusing auth failures deep into a test run.
+// Cached worker accounts older than this get re-registered from scratch
+// rather than trusted forever — guards against a stale/expired session
+// causing confusing auth failures deep into a run.
 const STALE_AFTER_MS = 24 * 60 * 60 * 1000; // 24 hours
 
-// registerWithRetry now lives in utils/registerWithRetry.js — shared with
+// registerWithRetry lives in utils/registerWithRetry.js, shared with
 // tests/auth/registration.spec.js so both get the same resilience against
-// this site's known-flaky registration endpoint, instead of duplicating
-// (and risking drifting) the retry logic in two places.
+// this site's flaky registration endpoint instead of duplicating the logic.
 
 /**
- * Registers and logs in one isolated account per Playwright worker, all
- * upfront before any test starts. Each worker writes its own
- * .auth/worker-N.json file, so parallel workers never share cart or order
- * state — eliminating the cross-worker race conditions that come from a
+ * Registers and logs in one isolated account per worker, all upfront before
+ * any test runs. Each worker writes its own .auth/worker-N.json, so parallel
+ * workers never share cart or order state — no cross-worker races from a
  * single shared account.
  *
- * Accounts are cached across runs: if a worker's storage state file
- * already exists and isn't stale, registration is skipped entirely for
- * that worker. This is what actually fixes slow startup — the bottleneck
- * was re-registering a brand-new account every single run, not the file
- * format used to store the result.
+ * Accounts are cached across runs: if a worker's storage state file exists
+ * and isn't stale, registration is skipped for that worker. That's the real
+ * startup fix — the bottleneck was re-registering a brand-new account every
+ * run, not the storage format.
  */
 export default async function globalSetup(config) {
   const workerCount = config.workers;
   fs.mkdirSync(AUTH_DIR, { recursive: true });
 
-  // Auto-write Allure's environment.properties on every run, so the
-  // generated report always shows current run context instead of the
-  // "There are no environment variables" empty state. allure-results/ gets
-  // wiped and rebuilt each run (via `allure generate --clean`), so this
-  // has to be written fresh here rather than committed as a static file.
+  // Write Allure's environment.properties every run so the report shows
+  // current run context instead of the empty "no environment variables"
+  // state. allure-results/ gets wiped and rebuilt each run (allure generate
+  // --clean), so this has to be written fresh here, not committed statically.
   fs.mkdirSync(ALLURE_RESULTS_DIR, { recursive: true });
   fs.writeFileSync(
     path.join(ALLURE_RESULTS_DIR, "environment.properties"),
@@ -74,10 +70,10 @@ export default async function globalSetup(config) {
           `Worker ${workerIndex}: reusing existing account (${Math.round(ageMs / 60000)}m old)`,
         );
 
-        // Cached accounts can now persist across multiple runs, not just
-        // within one — so a previous run's failed/incomplete afterEach
-        // cleanup can silently carry forward. Clear cart/orders here too,
-        // using the cached session, WITHOUT redoing full registration/login.
+        // Cached accounts can persist across runs now, so a previous run's
+        // failed/incomplete afterEach cleanup can carry forward. Clear
+        // cart/orders here using the cached session, without redoing
+        // registration/login.
         const cachePage = await browser.newPage({ storageState: authFile });
         await cachePage.goto(BASE_URL + ROUTES.cart, {
           waitUntil: "domcontentloaded",
@@ -112,7 +108,7 @@ export default async function globalSetup(config) {
     await page.waitForURL("**/dashboard/dash**");
     await page.locator(".card-body").first().waitFor();
 
-    // Safety net: clear any data the site might seed for new accounts.
+    // Safety net: clear anything the site might seed for new accounts.
     await page.goto(BASE_URL + ROUTES.cart, {
       waitUntil: "domcontentloaded",
     });

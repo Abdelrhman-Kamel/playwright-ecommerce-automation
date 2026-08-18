@@ -6,14 +6,14 @@ on:
   pull_request:
     branches: [main, master]
 
-# Needed for the GitHub Pages deployment step below.
+# Needed for the GitHub Pages deploy step below.
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Prevents overlapping Pages deployments if two pushes land close together —
-# GitHub rejects/races concurrent deploys to the same Pages site otherwise.
+# Avoid overlapping Pages deploys if two pushes land close together — GitHub
+# races/rejects concurrent deploys to the same Pages site.
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -30,10 +30,9 @@ jobs:
           node-version: lts/*
           cache: "npm"
 
-      # allure-commandline needs a JRE. ubuntu-latest currently ships one
-      # preinstalled, but relying on that implicitly is fragile — pin it
-      # explicitly so report generation doesn't silently break if GitHub
-      # changes the runner image later.
+      # allure-commandline needs a JRE. ubuntu-latest ships one today, but
+      # relying on that implicitly is fragile — pin it so report generation
+      # doesn't break if GitHub changes the runner image.
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -42,11 +41,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Only chromium is installed here — CI currently runs chromium-only
-      # for speed. Full cross-browser coverage (firefox, webkit) can be run
-      # locally via `npm run test` (no --project filter), or added as a
-      # separate scheduled workflow later if needed — no such workflow
-      # exists yet as of this file.
+      # chromium only — CI runs chromium-only for speed. Full cross-browser
+      # (firefox, webkit) runs locally via `npm run test`, or could be a
+      # separate scheduled workflow later (none exists yet).
       - name: Install Playwright Browsers (chromium only)
         run: npx playwright install --with-deps chromium
 
@@ -68,8 +65,8 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
-      # Tells Allure who/what actually ran this — populates the
-      # "Executors" panel on the report, which was empty when run locally.
+      # Tells Allure who/what ran this — fills the report's "Executors" panel,
+      # which is empty when run locally.
       - name: Write Allure executor info
         if: ${{ !cancelled() }}
         run: |
@@ -85,16 +82,13 @@ jobs:
           }
           EOF_INNER
 
-      # GitHub Pages deployments completely replace the site's contents on
-      # every deploy — unlike the Allure Jenkins Plugin, which manages
-      # build history internally, there's no persistent storage here
-      # holding the previous run's history/ folder. Without this, Trend
-      # data can never accumulate no matter how many times CI runs. Fix:
-      # pull the previous run's history files directly from the live
-      # Pages site (that site IS the last report, so its history/ files
-      # are already publicly there) before generating the new one.
-      # `|| true` on each line means a first-ever run (no history yet,
-      # 404s expected) doesn't fail the step.
+      # Pages deploys fully replace the site each time — unlike the Allure
+      # Jenkins plugin, there's no persistent storage holding the previous
+      # run's history/ folder, so Trend data can never build up. Fix: pull
+      # the previous run's history straight off the live Pages site (that
+      # site IS the last report, so its history/ files are already there)
+      # before generating the new one. `|| true` keeps a first-ever run
+      # (no history yet, 404s expected) from failing the step.
       - name: Restore previous Allure history for Trend data
         if: ${{ !cancelled() }}
         run: |
