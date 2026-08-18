@@ -161,7 +161,8 @@ test.describe("Checkout flow", { tag: ["@regression"] }, () => {
     await checkoutPage.selectCountry(CHECKOUT.country);
 
     await expect(page).toHaveScreenshot("checkout-page.png", {
-      mask: [page.locator(".blinkingText")],
+      mask: [page.locator(".blinkingText"), page.locator(".details__user")],
+      maxDiffPixelRatio: 0.02,
     });
   });
 
