@@ -1,4 +1,6 @@
-const BASE_URL = process.env.BASE_URL;
+// BASE_URL can carry a nav path (e.g. /client/), but the API sits at the
+// domain root — strip it down to the origin.
+const API_ORIGIN = new URL(process.env.BASE_URL).origin;
 
 export class API_Utils {
   constructor(apiContext, loginPayLoad) {
@@ -9,7 +11,7 @@ export class API_Utils {
   async getToken() {
     if (this._token) return this._token;
     const loginResponse = await this.apiContext.post(
-      `${BASE_URL}/api/ecom/auth/login`,
+      `${API_ORIGIN}/api/ecom/auth/login`,
       { data: this.loginPayLoad },
     );
     const loginResponseJson = await loginResponse.json();
@@ -19,7 +21,7 @@ export class API_Utils {
 
   async createOrder(createOrderPayload) {
     const createOrderResponse = await this.apiContext.post(
-      `${BASE_URL}/api/ecom/order/create-order`,
+      `${API_ORIGIN}/api/ecom/order/create-order`,
       {
         data: createOrderPayload,
         headers: {
