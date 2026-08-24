@@ -34,6 +34,14 @@ pipeline {
             }
         }
 
+        // Lint gate before tests. Pre-existing violations are baselined in
+        // eslint-suppressions.json, so this only fails on NEW issues.
+        stage('Lint') {
+            steps {
+                bat 'npm run lint'
+            }
+        }
+
         // No --with-deps here (it installs Linux apt packages, irrelevant on
         // Windows) — just the browser binary.
         stage('Install Playwright browsers') {

@@ -1,0 +1,17 @@
+{
+  "setup/globalSetup.js": {
+    "no-unused-vars": {
+      "count": 1
+    }
+  },
+  "tests/shopping/dashboard.spec.js": {
+    "no-unused-vars": {
+      "count": 1
+    }
+  },
+  "tests/smoke/full-journey.spec.js": {
+    "no-unused-vars": {
+      "count": 1
+    }
+  }
+}
