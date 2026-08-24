@@ -42,8 +42,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Lint gate — runs before tests. Pre-existing violations are baselined
-      # in eslint-suppressions.json, so this only fails on NEW issues.
+      # Lint before tests. Old violations are baselined in
+      # eslint-suppressions.json, so this only trips on new ones.
       - name: Lint
         run: npm run lint
 

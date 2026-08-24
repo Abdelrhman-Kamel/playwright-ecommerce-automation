@@ -33,8 +33,8 @@ export default [
     ],
   },
   {
-    // page.evaluate() callbacks run in the browser, so specs reference
-    // browser globals like window/document.
+    // page.evaluate() callbacks run in the browser, so specs touch
+    // window/document.
     files: ["tests/**/*.js"],
     languageOptions: {
       globals: {

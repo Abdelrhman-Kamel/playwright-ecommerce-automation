@@ -160,6 +160,7 @@ test.describe("Checkout flow", { tag: ["@regression"] }, () => {
     );
     await checkoutPage.selectCountry(CHECKOUT.country);
 
+    // selectCountry re-fetches; without this the shot can catch "Loading...."
     await checkoutPage.placeOrderButton.waitFor();
 
     await expect(page).toHaveScreenshot("checkout-page.png", {

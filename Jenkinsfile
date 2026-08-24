@@ -34,8 +34,8 @@ pipeline {
             }
         }
 
-        // Lint gate before tests. Pre-existing violations are baselined in
-        // eslint-suppressions.json, so this only fails on NEW issues.
+        // Lint before tests. Old violations are baselined in
+        // eslint-suppressions.json, so this only trips on new ones.
         stage('Lint') {
             steps {
                 bat 'npm run lint'
