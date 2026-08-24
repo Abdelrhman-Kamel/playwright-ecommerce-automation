@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { ROUTES } from "../constants/routes.js";
 import { LoginPage } from "../pageObjects/LoginPage.js";
-import { RegisterationPage } from "../pageObjects/RegisterationPage.js";
+import { RegistrationPage } from "../pageObjects/RegistrationPage.js";
 import { CartPage } from "../pageObjects/CartPage.js";
 import { OrdersPage } from "../pageObjects/OrdersPage.js";
 import { generateRegistrationData } from "../utils/testData.js";
@@ -52,7 +52,7 @@ export default async function globalSetup(config) {
     [
       `Base_URL=${BASE_URL}`,
       `Framework=Playwright`,
-      `Browsers=Chromium, Firefox, Webkit`,
+      `Browsers=Chromium`,
       `Environment=${process.env.CI ? "CI" : "Local"}`,
       `Run_Date=${new Date().toISOString()}`,
     ].join("\n"),
@@ -94,13 +94,13 @@ export default async function globalSetup(config) {
 
     const page = await browser.newPage();
     const loginPage = new LoginPage(page);
-    const registerationPage = new RegisterationPage(page);
+    const registrationPage = new RegistrationPage(page);
 
     await page.goto(BASE_URL + ROUTES.login, {
       waitUntil: "domcontentloaded",
     });
-    await loginPage.navigateToRegisteration();
-    const user = await registerWithRetry(loginPage, registerationPage, {
+    await loginPage.navigateToRegistration();
+    const user = await registerWithRetry(loginPage, registrationPage, {
       tag: `w${workerIndex}`,
     });
     await loginPage.login(user.email, user.password);

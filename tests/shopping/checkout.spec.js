@@ -160,6 +160,8 @@ test.describe("Checkout flow", { tag: ["@regression"] }, () => {
     );
     await checkoutPage.selectCountry(CHECKOUT.country);
 
+    await checkoutPage.placeOrderButton.waitFor();
+
     await expect(page).toHaveScreenshot("checkout-page.png", {
       mask: [page.locator(".blinkingText"), page.locator(".details__user")],
       maxDiffPixelRatio: 0.02,

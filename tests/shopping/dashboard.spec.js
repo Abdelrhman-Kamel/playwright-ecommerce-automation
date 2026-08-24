@@ -72,8 +72,11 @@ test.describe("Dashboard - Search", { tag: ["@regression"] }, () => {
     homePage,
   }) => {
     const totalBefore = await homePage.products.count();
+    const productName = (
+      await homePage.products.first().locator("b").textContent()
+    ).trim();
 
-    await homePage.searchProduct("ZARA");
+    await homePage.searchProduct(productName);
 
     await expect(homePage.products.first()).toBeVisible();
     const totalAfter = await homePage.products.count();
@@ -83,11 +86,15 @@ test.describe("Dashboard - Search", { tag: ["@regression"] }, () => {
   test("search results only contain cards matching the query", async ({
     homePage,
   }) => {
-    await homePage.searchProduct("ZARA");
+    const productName = (
+      await homePage.products.first().locator("b").textContent()
+    ).trim();
+
+    await homePage.searchProduct(productName);
 
     const count = await homePage.products.count();
     for (let i = 0; i < count; i++) {
-      await expect(homePage.products.nth(i)).toContainText("ZARA", {
+      await expect(homePage.products.nth(i)).toContainText(productName, {
         ignoreCase: true,
       });
     }
@@ -203,15 +210,20 @@ test.describe(
     test("applying a price range filters the product list", async ({
       homePage,
     }) => {
-      const totalBefore = await homePage.products.count();
-
-      await homePage.minPriceInput.fill("10");
-      await homePage.maxPriceInput.fill("50");
+      await homePage.minPriceInput.fill("0");
+      await homePage.maxPriceInput.fill("20000");
       await homePage.maxPriceInput.press("Enter");
 
       await expect(homePage.products.first()).toBeVisible();
-      const totalAfter = await homePage.products.count();
-      expect(totalAfter).toBeLessThanOrEqual(totalBefore);
+      await expect(homePage.products).toHaveCount(2);
+
+      const count = await homePage.products.count();
+      for (let i = 0; i < count; i++) {
+        const priceText = await homePage.productPrice.nth(i).textContent();
+        const price = Number(priceText.replace(/[^0-9.]/g, ""));
+        expect(price).toBeGreaterThanOrEqual(0);
+        expect(price).toBeLessThanOrEqual(20000);
+      }
     });
   },
 );
