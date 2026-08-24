@@ -15,66 +15,46 @@ export class POManager {
     this.pageObjects = {};
   }
 
-  getRegistrationPage() {
-    if (!this.pageObjects.registrationPage) {
-      this.pageObjects.registrationPage = new RegistrationPage(this.page);
+  #getOrCreate(key, PageObjectClass) {
+    if (!this.pageObjects[key]) {
+      this.pageObjects[key] = new PageObjectClass(this.page);
     }
-    return this.pageObjects.registrationPage;
+    return this.pageObjects[key];
+  }
+
+  getRegistrationPage() {
+    return this.#getOrCreate("registrationPage", RegistrationPage);
   }
 
   getLoginPage() {
-    if (!this.pageObjects.loginPage) {
-      this.pageObjects.loginPage = new LoginPage(this.page);
-    }
-    return this.pageObjects.loginPage;
+    return this.#getOrCreate("loginPage", LoginPage);
   }
 
   getHomePage() {
-    if (!this.pageObjects.homePage) {
-      this.pageObjects.homePage = new HomePage(this.page);
-    }
-    return this.pageObjects.homePage;
+    return this.#getOrCreate("homePage", HomePage);
   }
 
   getCartPage() {
-    if (!this.pageObjects.cartPage) {
-      this.pageObjects.cartPage = new CartPage(this.page);
-    }
-    return this.pageObjects.cartPage;
+    return this.#getOrCreate("cartPage", CartPage);
   }
 
   getCheckoutPage() {
-    if (!this.pageObjects.checkoutPage) {
-      this.pageObjects.checkoutPage = new CheckoutPage(this.page);
-    }
-    return this.pageObjects.checkoutPage;
+    return this.#getOrCreate("checkoutPage", CheckoutPage);
   }
 
   getOrdersPage() {
-    if (!this.pageObjects.ordersPage) {
-      this.pageObjects.ordersPage = new OrdersPage(this.page);
-    }
-    return this.pageObjects.ordersPage;
+    return this.#getOrCreate("ordersPage", OrdersPage);
   }
 
   getSideBar() {
-    if (!this.pageObjects.sideBar) {
-      this.pageObjects.sideBar = new SideBar(this.page);
-    }
-    return this.pageObjects.sideBar;
+    return this.#getOrCreate("sideBar", SideBar);
   }
 
   getOrderDetailsPage() {
-    if (!this.pageObjects.orderDetailsPage) {
-      this.pageObjects.orderDetailsPage = new OrderDetailsPage(this.page);
-    }
-    return this.pageObjects.orderDetailsPage;
+    return this.#getOrCreate("orderDetailsPage", OrderDetailsPage);
   }
 
   getOrderViewPage() {
-    if (!this.pageObjects.orderViewPage) {
-      this.pageObjects.orderViewPage = new OrderViewPage(this.page);
-    }
-    return this.pageObjects.orderViewPage;
+    return this.#getOrCreate("orderViewPage", OrderViewPage);
   }
 }

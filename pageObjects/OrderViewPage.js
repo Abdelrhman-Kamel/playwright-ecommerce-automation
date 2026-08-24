@@ -23,12 +23,10 @@ export class OrderViewPage {
     this.orderedProductPrice = this.productCard.locator(".price");
   }
 
-  async getBillingDetails() {
-    await this.billingSection.waitFor();
+  async #getAddressDetails(section) {
+    await section.waitFor();
 
-    const [email, country] = await this.billingSection
-      .locator("p")
-      .allTextContents();
+    const [email, country] = await section.locator("p").allTextContents();
 
     return {
       email: email.trim(),
@@ -36,16 +34,11 @@ export class OrderViewPage {
     };
   }
 
-  async getDeliveryDetails() {
-    await this.deliverySection.waitFor();
+  getBillingDetails() {
+    return this.#getAddressDetails(this.billingSection);
+  }
 
-    const [email, country] = await this.deliverySection
-      .locator("p")
-      .allTextContents();
-
-    return {
-      email: email.trim(),
-      country: country.replace("Country - ", "").trim(),
-    };
+  getDeliveryDetails() {
+    return this.#getAddressDetails(this.deliverySection);
   }
 }
