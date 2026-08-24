@@ -1,3 +1,5 @@
+const BASE_URL = process.env.BASE_URL;
+
 export class API_Utils {
   constructor(apiContext, loginPayLoad) {
     this.apiContext = apiContext;
@@ -7,7 +9,7 @@ export class API_Utils {
   async getToken() {
     if (this._token) return this._token;
     const loginResponse = await this.apiContext.post(
-      "https://rahulshettyacademy.com/api/ecom/auth/login",
+      `${BASE_URL}/api/ecom/auth/login`,
       { data: this.loginPayLoad },
     );
     const loginResponseJson = await loginResponse.json();
@@ -17,7 +19,7 @@ export class API_Utils {
 
   async createOrder(createOrderPayload) {
     const createOrderResponse = await this.apiContext.post(
-      "https://rahulshettyacademy.com/api/ecom/order/create-order",
+      `${BASE_URL}/api/ecom/order/create-order`,
       {
         data: createOrderPayload,
         headers: {

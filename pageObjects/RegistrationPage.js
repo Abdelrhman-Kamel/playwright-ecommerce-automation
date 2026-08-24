@@ -1,4 +1,4 @@
-export class RegisterationPage {
+export class RegistrationPage {
   constructor(page) {
     this.page = page;
     this.firstNameInput = page.getByPlaceholder("First Name");

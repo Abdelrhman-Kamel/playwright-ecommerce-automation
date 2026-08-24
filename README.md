@@ -76,7 +76,7 @@ playwright-ecommerce-automation/
 ├── pageObjects/                # One class per page/component
 │   ├── POManager.js           # Lazy-caching factory for all page objects
 │   ├── LoginPage.js
-│   ├── RegisterationPage.js
+│   ├── RegistrationPage.js
 │   ├── HomePage.js
 │   ├── CartPage.js
 │   ├── CheckoutPage.js

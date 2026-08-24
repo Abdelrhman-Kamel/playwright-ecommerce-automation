@@ -16,9 +16,9 @@ test.describe("Registration", { tag: ["@regression"] }, () => {
 
   test("a new user can register successfully", async ({
     loginPage,
-    registerationPage,
+    registrationPage,
   }) => {
-    await registerWithRetry(loginPage, registerationPage);
+    await registerWithRetry(loginPage, registrationPage);
 
     await expect(loginPage.loginButton).toBeVisible();
   });
@@ -26,9 +26,9 @@ test.describe("Registration", { tag: ["@regression"] }, () => {
   test("successful registration redirects to the login page", async ({
     page,
     loginPage,
-    registerationPage,
+    registrationPage,
   }) => {
-    await registerWithRetry(loginPage, registerationPage);
+    await registerWithRetry(loginPage, registrationPage);
 
     await expect(page).toHaveURL(/.*\/#\/auth\/login/);
     await expect(loginPage.loginButton).toBeVisible();
@@ -36,9 +36,9 @@ test.describe("Registration", { tag: ["@regression"] }, () => {
 
   test("user can register with Male gender", async ({
     loginPage,
-    registerationPage,
+    registrationPage,
   }) => {
-    await registerWithRetry(loginPage, registerationPage, {
+    await registerWithRetry(loginPage, registrationPage, {
       overrides: { gender: "Male" },
     });
 
@@ -47,9 +47,9 @@ test.describe("Registration", { tag: ["@regression"] }, () => {
 
   test("user can register with Female gender", async ({
     loginPage,
-    registerationPage,
+    registrationPage,
   }) => {
-    await registerWithRetry(loginPage, registerationPage, {
+    await registerWithRetry(loginPage, registrationPage, {
       overrides: { gender: "Female" },
     });
 
@@ -59,18 +59,18 @@ test.describe("Registration", { tag: ["@regression"] }, () => {
   test("registering with a duplicate email shows an error", async ({
     page,
     loginPage,
-    registerationPage,
+    registrationPage,
   }) => {
     // First registration must actually succeed, so it gets the same retry
     // resilience as the other tests (flaky endpoint).
-    const user = await registerWithRetry(loginPage, registerationPage);
+    const user = await registerWithRetry(loginPage, registrationPage);
 
     // Re-submit the SAME email — do NOT retry here, since a retry would
     // generate a fresh email and defeat the duplicate-email check.
     await page.goto(ROUTES.register);
-    await registerationPage.registerButton.waitFor();
+    await registrationPage.registerButton.waitFor();
 
-    await registerationPage.fillAndSubmit(
+    await registrationPage.fillAndSubmit(
       user.firstName,
       user.lastName,
       user.email,
@@ -97,43 +97,43 @@ test.describe("Registration page UI", { tag: ["@regression"] }, () => {
 
   test("all required form fields are visible on page load", async ({
     page,
-    registerationPage,
+    registrationPage,
   }) => {
     await expect(page.getByRole("heading", { name: "Register" })).toBeVisible();
-    await expect(registerationPage.firstNameInput).toBeVisible();
-    await expect(registerationPage.lastNameInput).toBeVisible();
-    await expect(registerationPage.emailInput).toBeVisible();
-    await expect(registerationPage.phoneNumberInput).toBeVisible();
-    await expect(registerationPage.occupationDropDown).toBeVisible();
+    await expect(registrationPage.firstNameInput).toBeVisible();
+    await expect(registrationPage.lastNameInput).toBeVisible();
+    await expect(registrationPage.emailInput).toBeVisible();
+    await expect(registrationPage.phoneNumberInput).toBeVisible();
+    await expect(registrationPage.occupationDropDown).toBeVisible();
     await expect(
       page.getByRole("radio", { name: "Male", exact: true }),
     ).toBeVisible();
     await expect(
       page.getByRole("radio", { name: "Female", exact: true }),
     ).toBeVisible();
-    await expect(registerationPage.passwordInput).toBeVisible();
-    await expect(registerationPage.confirmPasswordInput).toBeVisible();
-    await expect(registerationPage.ageConsent).toBeVisible();
-    await expect(registerationPage.registerButton).toBeVisible();
+    await expect(registrationPage.passwordInput).toBeVisible();
+    await expect(registrationPage.confirmPasswordInput).toBeVisible();
+    await expect(registrationPage.ageConsent).toBeVisible();
+    await expect(registrationPage.registerButton).toBeVisible();
   });
 
   test("Register button has the correct label", async ({
-    registerationPage,
+    registrationPage,
   }) => {
-    await expect(registerationPage.registerButton).toHaveText("Register");
+    await expect(registrationPage.registerButton).toHaveText("Register");
   });
 
   test("'Login here' link is visible and navigates to the login page", async ({
     page,
     loginPage,
-    registerationPage,
+    registrationPage,
   }) => {
-    await expect(registerationPage.loginHereLink).toBeVisible();
+    await expect(registrationPage.loginHereLink).toBeVisible();
 
     // The decorative .banner layer sits over this footer link and swallows
     // clicks (even forced ones hit the overlay). Dispatch the click straight
     // to the node so its router handler fires.
-    await registerationPage.loginHereLink.dispatchEvent("click");
+    await registrationPage.loginHereLink.dispatchEvent("click");
 
     await expect(page).toHaveURL(/.*\/#\/auth\/login/);
     await expect(loginPage.loginButton).toBeVisible();
@@ -141,11 +141,11 @@ test.describe("Registration page UI", { tag: ["@regression"] }, () => {
 
   test("mismatched passwords show a validation error", async ({
     page,
-    registerationPage,
+    registrationPage,
   }) => {
     const user = generateRegistrationData();
 
-    await registerationPage.fillAndSubmit(
+    await registrationPage.fillAndSubmit(
       user.firstName,
       user.lastName,
       user.email,

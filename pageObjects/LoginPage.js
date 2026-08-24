@@ -22,7 +22,7 @@ export class LoginPage {
     await this.page.locator(".card-body").first().waitFor({ timeout: 8000 });
   }
 
-  async navigateToRegisteration() {
+  async navigateToRegistration() {
     await this.registerLink.click();
     await this.page.getByRole("button", { name: "Register" }).waitFor();
   }

@@ -134,7 +134,7 @@ test.describe("Login page UI", { tag: ["@regression"] }, () => {
     page,
     loginPage,
   }) => {
-    await loginPage.navigateToRegisteration();
+    await loginPage.navigateToRegistration();
 
     await expect(page).toHaveURL(/.*\/#\/auth\/register/);
     await expect(page.getByRole("button", { name: "Register" })).toBeVisible();

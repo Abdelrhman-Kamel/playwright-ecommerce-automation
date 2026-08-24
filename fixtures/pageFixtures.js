@@ -57,8 +57,8 @@ export const test = base.extend({
     await use(poManager.getLoginPage());
   },
 
-  registerationPage: async ({ poManager }, use) => {
-    await use(poManager.getRegisterationPage());
+  registrationPage: async ({ poManager }, use) => {
+    await use(poManager.getRegistrationPage());
   },
 
   homePage: async ({ poManager }, use) => {

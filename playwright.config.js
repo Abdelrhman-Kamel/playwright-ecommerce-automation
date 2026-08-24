@@ -18,7 +18,7 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry once locally too — this site has external response flakiness
-     (see pageObjects/RegisterationPage.js and utils/registerWithRetry.js),
+     (see pageObjects/RegistrationPage.js and utils/registerWithRetry.js),
      so one local retry cuts false failures without hiding real bugs (still
      fails loudly once retries are exhausted). CI retries more since it's
      unattended and slower. */

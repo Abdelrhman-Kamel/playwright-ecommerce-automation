@@ -1,4 +1,4 @@
-import { RegisterationPage } from "./RegisterationPage.js";
+import { RegistrationPage } from "./RegistrationPage.js";
 import { LoginPage } from "./LoginPage.js";
 import { HomePage } from "./HomePage.js";
 import { CartPage } from "./CartPage.js";
@@ -15,11 +15,11 @@ export class POManager {
     this.pageObjects = {};
   }
 
-  getRegisterationPage() {
-    if (!this.pageObjects.registerationPage) {
-      this.pageObjects.registerationPage = new RegisterationPage(this.page);
+  getRegistrationPage() {
+    if (!this.pageObjects.registrationPage) {
+      this.pageObjects.registrationPage = new RegistrationPage(this.page);
     }
-    return this.pageObjects.registerationPage;
+    return this.pageObjects.registrationPage;
   }
 
   getLoginPage() {

@@ -21,7 +21,7 @@ import { generateRegistrationData } from "./testData.js";
  */
 export async function registerWithRetry(
   loginPage,
-  registerationPage,
+  registrationPage,
   { overrides = {}, tag = "", attempts = 3 } = {},
 ) {
   // Each attempt can take ~30s (waiting on the flaky modal) plus fill/submit
@@ -41,8 +41,8 @@ export async function registerWithRetry(
     // state, so restart each retry from a freshly reloaded page instead of
     // re-filling on top of the poisoned one.
     if (attempt > 1) {
-      await registerationPage.page.reload({ waitUntil: "domcontentloaded" });
-      await registerationPage.registerButton.waitFor();
+      await registrationPage.page.reload({ waitUntil: "domcontentloaded" });
+      await registrationPage.registerButton.waitFor();
     }
 
     const user = { ...generateRegistrationData(), ...overrides };
@@ -50,7 +50,7 @@ export async function registerWithRetry(
     user.email = user.email.replace("@test.com", `.${suffix}@test.com`);
 
     try {
-      await registerationPage.register(
+      await registrationPage.register(
         user.firstName,
         user.lastName,
         user.email,
