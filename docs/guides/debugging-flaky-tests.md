@@ -35,3 +35,15 @@ If a mask or tolerance change is added but only one platform's baseline gets reg
 ## General principle: verify against the real DOM before writing a selector
 
 Several debugging sessions in this project's history were resolved not by guessing a fix, but by asking for the actual rendered HTML and checking a selector against it directly, rather than assuming a plausible-sounding class name is correct. When a locator-based test fails unexpectedly, get the real DOM before changing the selector.
+
+## Pattern: intermittent unexplained layout shift, root cause not found
+
+Not every flaky test has a clean, fully-diagnosed fix — worth documenting honestly when that happens rather than papering over it.
+
+The checkout page's visual regression test went through several real, confirmed fixes (masking an animating banner, masking a variable-length account email plus a small pixel tolerance for its layout reflow, waiting for genuine render completion before the screenshot) — each one addressed a real, verified cause. Despite all of that, it continued to intermittently capture the page in a narrower, single-column layout (form fields that should render side-by-side collapsing into one column) even with an explicit `viewport: { width: 1920, height: 1080 }` set globally, no per-file override, and a confirmed-correct baseline.
+
+No confident root cause was found — candidates considered but not confirmed included a CSS breakpoint evaluation race and CI-runner-specific window sizing, but none were verified against real evidence strong enough to justify a fix.
+
+**Decision: removed the test rather than keep patching around an undiagnosed cause.** A test that fails unpredictably for reasons unrelated to real regressions actively erodes trust in CI — the point of automated checks is confidence, and a check that cries wolf for unknown reasons undermines that regardless of how many real bugs it might also catch. The page's functional tests (payment method display, order confirmation, billing address) still provide real coverage of what actually matters on this page; only the full-page pixel comparison was removed.
+
+Worth revisiting if a genuine root cause surfaces later — this is a "not solved" entry, not a "doesn't matter" one.

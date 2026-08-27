@@ -1,7 +1,7 @@
 # playwright-ecommerce-automation
 
 [![Playwright Tests](https://github.com/Abdelrhman-Kamel/playwright-ecommerce-automation/actions/workflows/playwright.yml/badge.svg)](https://github.com/Abdelrhman-Kamel/playwright-ecommerce-automation/actions/workflows/playwright.yml)
-![Tests](https://img.shields.io/badge/tests-70%20passing%20%C2%B7%206%20known%20issues-brightgreen)
+![Tests](https://img.shields.io/badge/tests-69%20passing%20%C2%B7%206%20known%20issues-brightgreen)
 ![Playwright](https://img.shields.io/badge/Playwright-1.61-2EAD33?logo=playwright&logoColor=white)
 ![Node](https://img.shields.io/badge/node-LTS-339933?logo=node.js&logoColor=white)
 ![Allure](https://img.shields.io/badge/reporting-Allure-orange)
@@ -11,7 +11,7 @@
 
 An end-to-end test automation framework for an e-commerce site ([Rahul Shetty Academy's practice app](https://rahulshettyacademy.com/client/)), built to demonstrate production-grade Playwright practices: page object architecture, worker-isolated authentication, API-level security testing, visual regression, accessibility auditing, and dual CI/CD pipelines with rich reporting.
 
-**76 tests** across UI, API, security, visual regression, and accessibility layers — **70 passing, 6 tracked known issues** (real bugs found via automation), organized by feature domain, tagged for selective execution, and running clean in both GitHub Actions and Jenkins.
+**75 tests** across UI, API, security, visual regression, and accessibility layers — **69 passing, 6 tracked known issues** (real bugs found via automation), organized by feature domain, tagged for selective execution, and running clean in both GitHub Actions and Jenkins.
 
 ---
 

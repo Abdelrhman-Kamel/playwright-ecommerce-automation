@@ -147,28 +147,6 @@ test.describe("Checkout flow", { tag: ["@regression"] }, () => {
     expect(billing.country).toContain(CHECKOUT.country);
   });
 
-  test("visual regression: checkout page layout", async ({
-    page,
-    checkoutPage,
-  }) => {
-    await checkoutPage.fillCreditCardDetails(
-      CHECKOUT.cardNumber,
-      CHECKOUT.month,
-      CHECKOUT.year,
-      CHECKOUT.cvv,
-      CHECKOUT.nameOnCard,
-    );
-    await checkoutPage.selectCountry(CHECKOUT.country);
-
-    // selectCountry re-fetches; without this the shot can catch "Loading...."
-    await checkoutPage.placeOrderButton.waitFor();
-
-    await expect(page).toHaveScreenshot("checkout-page.png", {
-      mask: [page.locator(".blinkingText"), page.locator(".details__user")],
-      maxDiffPixelRatio: 0.02,
-    });
-  });
-
   test("accessibility: checkout page has no WCAG 2.1 AA violations", async ({
     page,
     checkoutPage,
