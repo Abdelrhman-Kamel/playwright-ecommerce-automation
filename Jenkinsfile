@@ -52,6 +52,10 @@ pipeline {
 
         stage('Run Playwright tests') {
             steps {
+                // Persistent Jenkins workspace: wipe last build's Allure
+                // results so `allure generate` only sees this run's output.
+                bat 'if exist allure-results rmdir /s /q allure-results'
+
                 // catchError lets the pipeline continue into post{} (report
                 // generation/publishing) even when tests fail, instead of
                 // aborting the build — same idea as the if: ${{ !cancelled() }}
