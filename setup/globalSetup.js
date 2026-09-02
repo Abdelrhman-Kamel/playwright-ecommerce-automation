@@ -58,6 +58,41 @@ export default async function globalSetup(config) {
     ].join("\n"),
   );
 
+  // Write Allure's categories.json every run for the same reason as
+  // environment.properties: allure-results/ is wiped and rebuilt each run,
+  // so this defect-categorization config has to be emitted fresh here.
+  fs.writeFileSync(
+    path.join(ALLURE_RESULTS_DIR, "categories.json"),
+    JSON.stringify(
+      [
+        {
+          name: "External site flakiness",
+          matchedStatuses: ["failed", "broken"],
+          messageRegex:
+            ".*(socket hang up|ETIMEDOUT|ECONNRESET|net::ERR_.*|Registration attempt.*failed|cached account stale).*",
+        },
+        {
+          name: "Visual regression diffs",
+          matchedStatuses: ["failed", "broken"],
+          messageRegex: ".*pixels.*ratio.*of all image pixels.*are different.*",
+        },
+        {
+          name: "Selector / locator not found",
+          matchedStatuses: ["failed", "broken"],
+          messageRegex:
+            ".*(waiting for (locator|selector)|Timeout.*exceeded.*waiting for).*",
+        },
+        {
+          name: "Application defects",
+          matchedStatuses: ["failed", "broken"],
+          messageRegex: ".*",
+        },
+      ],
+      null,
+      2,
+    ),
+  );
+
   const browser = await chromium.launch();
 
   for (let workerIndex = 0; workerIndex < workerCount; workerIndex++) {

@@ -3,6 +3,7 @@ import { allure } from "allure-playwright";
 import path from "path";
 import { fileURLToPath } from "url";
 import { POManager } from "../pageObjects/POManager";
+import { classifyFailure } from "../utils/classifyFailure.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -34,6 +35,13 @@ export const test = base.extend({
         }
       }
       await use();
+
+      // testInfo.status/error are only final after the test body finishes,
+      // so classify here (post-use), not before.
+      if (testInfo.status === "failed" || testInfo.status === "timedOut") {
+        const failureClass = classifyFailure(testInfo.error?.message ?? "");
+        allure.label("failureClass", failureClass);
+      }
     },
     { auto: true },
   ],
